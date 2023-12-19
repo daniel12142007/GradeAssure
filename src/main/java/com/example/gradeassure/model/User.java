@@ -1,7 +1,6 @@
 package com.example.gradeassure.model;
 
 import com.example.gradeassure.model.enums.Role;
-
 import lombok.Data;
 
 import javax.persistence.*;
