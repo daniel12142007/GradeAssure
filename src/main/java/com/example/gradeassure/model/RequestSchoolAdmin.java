@@ -18,6 +18,9 @@ public class RequestSchoolAdmin {
     private LocalDateTime dateDeadline;
     private boolean answered;
 
+    @Column(name = "overdue", nullable = false, columnDefinition = "boolean default false")
+    private boolean overdue;
+
     @ManyToOne
     @JoinColumn(name = "schoolAdmin_id")
     private SchoolAdmin schoolAdmin;
