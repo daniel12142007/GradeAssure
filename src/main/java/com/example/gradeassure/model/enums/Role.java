@@ -4,9 +4,10 @@ import org.springframework.security.core.GrantedAuthority;
 
 public enum Role implements GrantedAuthority {
     ADMINSCHOOL,
-    STUDENT,
     ADMIN,
-    TEACHER;
+    TEACHER,
+    STUDENT,
+    USER;
 
     @Override
     public String getAuthority() {

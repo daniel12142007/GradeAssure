@@ -1,7 +1,6 @@
 package com.example.gradeassure.model;
 
 import com.example.gradeassure.model.enums.Role;
-
 import lombok.Data;
 
 import javax.persistence.*;
@@ -29,5 +28,6 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Student student;
+
 
 }
