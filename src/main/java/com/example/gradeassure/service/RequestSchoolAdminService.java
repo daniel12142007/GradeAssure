@@ -1,6 +1,7 @@
 package com.example.gradeassure.service;
 
 import com.example.gradeassure.dto.Response.RequestSchoolAdminResponse;
+import com.example.gradeassure.dto.Response.SchoolAdminResponse;
 import com.example.gradeassure.model.RequestSchoolAdmin;
 import com.example.gradeassure.model.SchoolAdmin;
 import com.example.gradeassure.model.User;
@@ -99,16 +100,19 @@ public class RequestSchoolAdminService {
         return "Выбранные запросы отклонены.";
     }
 
-    public String blockSchoolAdmins(List<Long> schoolAdminIds) {
-        List<SchoolAdmin> schoolAdmins = schoolAdminRepository.findAllById(schoolAdminIds);
+    public String blockRequests(List<Long> requestIds) {
+        List<RequestSchoolAdmin> requests = requestRepository.findAllById(requestIds);
 
-        schoolAdmins.stream()
-                .filter(schoolAdmin -> !schoolAdmin.isBlocked())
-                .forEach(schoolAdmin -> schoolAdmin.setBlocked(true));
+        requests.stream()
+                .filter(request -> !request.isAnswered())
+                .forEach(request -> {
+                    request.setAnswered(true);
+                    request.setDateAnswered(LocalDateTime.now());
+                });
 
-        schoolAdminRepository.saveAll(schoolAdmins);
+        requestRepository.saveAll(requests);
 
-        return "Выбранные администраторы заблокированы.";
+        return "Выбранные запросы заблокированы.";
     }
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -126,4 +130,31 @@ public class RequestSchoolAdminService {
         requestRepository.saveAll(overdueRequests);
     }
 
+    public List<SchoolAdmin> getAllUnblockedSchoolAdmins() {
+        return schoolAdminRepository.findAllUnblockedSchoolAdmins();
+    }
+
+    public String blockSchoolAdmins(List<Long> schoolAdminIds) {
+        List<SchoolAdmin> schoolAdmins = schoolAdminRepository.findAllById(schoolAdminIds);
+
+        long countBlocked = schoolAdmins.stream()
+                .filter(schoolAdmin -> !schoolAdmin.isBlocked())
+                .peek(schoolAdmin -> schoolAdmin.setBlocked(true))
+                .count();
+
+        schoolAdminRepository.saveAll(schoolAdmins);
+
+        return "Блокировано " + countBlocked + " администраторов школы.";
+    }
+
+    public SchoolAdmin findSchoolAdminById(Long schoolAdminId) {
+        return schoolAdminRepository.findById(schoolAdminId)
+                .orElseThrow(() -> new RuntimeException("Администратор школы не найден"));
+    }
+
+    public SchoolAdminResponse getSchoolAdminDetails(Long schoolAdminId) {
+        SchoolAdmin schoolAdmin = findSchoolAdminById(schoolAdminId);
+
+        return new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName());
+    }
 }

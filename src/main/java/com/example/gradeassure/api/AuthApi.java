@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthApi {
 
-     private final UserService userService;
-     private final Auth auth;
+    private final UserService userService;
+    private final Auth auth;
 
 
     @PostMapping("save")
@@ -27,20 +27,22 @@ public class AuthApi {
     }
 
     @GetMapping("sendcode")
-    public UserResponse mars(@RequestParam String email){
-        return  userService.send(email);
+    public UserResponse mars(@RequestParam String email) {
+        return userService.send(email);
 
     }
+
     @GetMapping("checkpassword")
-    public UserResponse marse(@RequestParam String password1, @RequestParam String password, @RequestParam String email){
+    public UserResponse marse(@RequestParam String password1, @RequestParam String password, @RequestParam String email) {
         return userService.reset(password1, password, email);
 
     }
-   @GetMapping("changepassword")
-    public UserResponse marsel(@RequestParam String email, @RequestParam String code){
 
-       return userService.isCodeValid(email,code);
-   }
+    @GetMapping("changepassword")
+    public UserResponse marsel(@RequestParam String email, @RequestParam String code) {
+
+        return userService.isCodeValid(email, code);
+    }
 
 
 }
