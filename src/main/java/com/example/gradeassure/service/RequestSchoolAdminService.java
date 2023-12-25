@@ -1,6 +1,6 @@
 package com.example.gradeassure.service;
 
-import com.example.gradeassure.dto.Response.RequestSchoolAdminResponse;
+import com.example.gradeassure.dto.response.RequestSchoolAdminResponse;
 import com.example.gradeassure.model.RequestSchoolAdmin;
 import com.example.gradeassure.model.SchoolAdmin;
 import com.example.gradeassure.model.User;

@@ -1,6 +1,6 @@
 package com.example.gradeassure.service;
 
-import com.example.gradeassure.dto.Response.UserResponse;
+import com.example.gradeassure.dto.response.UserResponse;
 import com.example.gradeassure.model.User;
 import com.example.gradeassure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
