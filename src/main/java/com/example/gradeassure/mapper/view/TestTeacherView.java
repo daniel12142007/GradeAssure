@@ -1,6 +1,6 @@
 package com.example.gradeassure.mapper.view;
 
-import com.example.gradeassure.dto.Response.TestTeacherResponse;
+import com.example.gradeassure.dto.response.TestTeacherResponse;
 import com.example.gradeassure.model.TestTeacher;
 import org.springframework.stereotype.Component;
 
