@@ -1,8 +1,6 @@
 package com.example.gradeassure.api;
 
-import com.example.gradeassure.dto.Response.SchoolAdminResponse;
-import com.example.gradeassure.model.SchoolAdmin;
-import com.example.gradeassure.repository.SchoolAdminRepository;
+import com.example.gradeassure.dto.response.SchoolAdminResponse;
 import com.example.gradeassure.service.RequestSchoolAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

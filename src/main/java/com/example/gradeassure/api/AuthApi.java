@@ -1,7 +1,6 @@
 package com.example.gradeassure.api;
 
-import com.example.gradeassure.dto.Response.UserResponse;
-import com.example.gradeassure.model.enums.Role;
+import com.example.gradeassure.dto.response.UserResponse;
 import com.example.gradeassure.service.UserService;
 import com.example.gradeassure.service.auth.Auth;
 import lombok.RequiredArgsConstructor;

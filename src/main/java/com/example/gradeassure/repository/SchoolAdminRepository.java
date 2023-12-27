@@ -1,6 +1,5 @@
 package com.example.gradeassure.repository;
 
-import com.example.gradeassure.dto.Response.SchoolAdminResponse;
 import com.example.gradeassure.model.SchoolAdmin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
