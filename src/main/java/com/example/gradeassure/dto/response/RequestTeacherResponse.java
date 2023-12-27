@@ -1,4 +1,4 @@
-package com.example.gradeassure.dto.Response;
+package com.example.gradeassure.dto.response;
 
 import com.example.gradeassure.model.enums.Action;
 import lombok.Data;
