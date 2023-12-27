@@ -29,35 +29,45 @@ public class RequestAdminApi {
         return requestSchoolAdminService.rejectRequests(requestIds);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @PostMapping("/block-school-admins")
-    public String blockRequests(@RequestBody List<Long> requestSchoolAdminId) {
-        return requestSchoolAdminService.blockRequests(requestSchoolAdminId);
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @GetMapping("/unblocked-school-admins")
-    public List<SchoolAdmin> getAllUnblockedSchoolAdmins() {
-        return requestSchoolAdminService.getAllUnblockedSchoolAdmins();
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/block-requests")
-    public String blockSchoolAdmins(@RequestBody List<Long> requestIds) {
-        return requestSchoolAdminService.blockSchoolAdmins(requestIds);
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<List<SchoolAdminResponse>> blockRequests(@RequestBody List<Long> schoolAdminIds) {
+        List<SchoolAdminResponse> responses = requestSchoolAdminService.blockSchoolAdmins(schoolAdminIds);
+        return ResponseEntity.ok(responses);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @GetMapping("/school-admin/{schoolAdminId}")
-    public ResponseEntity<SchoolAdmin> getSchoolAdminById(@PathVariable Long schoolAdminId) {
-        SchoolAdmin schoolAdmin = requestSchoolAdminService.findSchoolAdminById(schoolAdminId);
+    @GetMapping("/find-by-id-school-admin/{schoolAdminId}")
+    public ResponseEntity<SchoolAdminResponse> look(@PathVariable Long schoolAdminId) {
+        SchoolAdminResponse schoolAdmin = requestSchoolAdminService.findSchoolAdminById(schoolAdminId);
         return ResponseEntity.ok(schoolAdmin);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @GetMapping("/school-admin/{schoolAdminId}")
-    public ResponseEntity<SchoolAdminResponse> getSchoolAdminDetails(@PathVariable Long schoolAdminId) {
-        SchoolAdminResponse schoolAdminResponse = requestSchoolAdminService.getSchoolAdminDetails(schoolAdminId);
+    @GetMapping("/find-all-unblocked-school-admins")
+    public List<SchoolAdminResponse> getAllUnblockedSchoolAdmins() {
+        return requestSchoolAdminService.getAllUnblockedSchoolAdmins();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @GetMapping("/school-admin-look/{schoolAdminEmail}")
+    public ResponseEntity<SchoolAdminResponse> getSchoolAdminDetails(@PathVariable String schoolAdminEmail) {
+        SchoolAdminResponse schoolAdminResponse = requestSchoolAdminService.look(schoolAdminEmail);
         return ResponseEntity.ok(schoolAdminResponse);
+    }
+
+
+    @PostMapping("/block-school-admins")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<List<SchoolAdminResponse>> blockSchoolAdmins(@RequestBody List<Long> schoolAdminIds) {
+        List<SchoolAdminResponse> responses = requestSchoolAdminService.blockSchoolAdmins(schoolAdminIds);
+        return ResponseEntity.ok(responses);
+    }
+
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<String> deleteSchoolAdmins(@RequestBody List<Long> schoolAdminIds) {
+        requestSchoolAdminService.deleteSchoolAdmins(schoolAdminIds);
+        return ResponseEntity.ok("school admins deleted");
     }
 }

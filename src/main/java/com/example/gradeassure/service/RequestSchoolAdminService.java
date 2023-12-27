@@ -15,8 +15,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -38,14 +41,15 @@ public class RequestSchoolAdminService {
         SchoolAdmin schoolAdmin = new SchoolAdmin();
         schoolAdmin.setId(currentUser.getId());
         schoolAdmin.setEmail(currentUser.getEmail());
+        schoolAdmin.setFullName(currentUser.getFullName());
         schoolAdmin.setUser(currentUser);
+
         schoolAdminRepository.save(schoolAdmin);
 
         if (schoolAdmin == null) {
             throw new AccessDeniedException("Текущий пользователь не является администратором школы");
         }
 
-        // Проверьте, отправлял ли администратор школы запрос ранее
         if (requestRepository.countBySchoolAdminAndAnsweredFalse(schoolAdmin).orElse(0L) >= 2) {
             throw new IllegalStateException("Вы не можете отправить более двух запросов.");
         }
@@ -100,21 +104,6 @@ public class RequestSchoolAdminService {
         return "Выбранные запросы отклонены.";
     }
 
-    public String blockRequests(List<Long> requestIds) {
-        List<RequestSchoolAdmin> requests = requestRepository.findAllById(requestIds);
-
-        requests.stream()
-                .filter(request -> !request.isAnswered())
-                .forEach(request -> {
-                    request.setAnswered(true);
-                    request.setDateAnswered(LocalDateTime.now());
-                });
-
-        requestRepository.saveAll(requests);
-
-        return "Выбранные запросы заблокированы.";
-    }
-
     @Scheduled(cron = "0 0 0 * * *")
     public void checkDeadlinesForSchoolAdmin() {
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -130,31 +119,76 @@ public class RequestSchoolAdminService {
         requestRepository.saveAll(overdueRequests);
     }
 
-    public List<SchoolAdmin> getAllUnblockedSchoolAdmins() {
-        return schoolAdminRepository.findAllUnblockedSchoolAdmins();
-    }
+    public List<SchoolAdminResponse> getAllUnblockedSchoolAdmins() {
+        List<SchoolAdmin> unblockedSchoolAdmins = schoolAdminRepository.findAllUnblockedSchoolAdmins();
 
-    public String blockSchoolAdmins(List<Long> schoolAdminIds) {
+        return unblockedSchoolAdmins.stream()
+                .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName()))
+                .collect(Collectors.toList());
+    }
+    public List<SchoolAdminResponse> blockSchoolAdmins(List<Long> schoolAdminIds) {
         List<SchoolAdmin> schoolAdmins = schoolAdminRepository.findAllById(schoolAdminIds);
 
-        long countBlocked = schoolAdmins.stream()
+        List<SchoolAdminResponse> responses = schoolAdmins.stream()
                 .filter(schoolAdmin -> !schoolAdmin.isBlocked())
-                .peek(schoolAdmin -> schoolAdmin.setBlocked(true))
-                .count();
+                .peek(schoolAdmin -> {
+                    schoolAdmin.setBlocked(true);
+                    schoolAdminRepository.save(schoolAdmin);
+                })
+                .map(schoolAdmin -> {
+                    User user = schoolAdmin.getUser();
+                    Role blockedRole = Role.BLOCKED;
 
-        schoolAdminRepository.saveAll(schoolAdmins);
 
-        return "Блокировано " + countBlocked + " администраторов школы.";
+                    user.setRole(blockedRole);
+                    userRepository.save(user);
+                    return mapToSchoolAdminResponse(schoolAdmin);
+                })
+                .collect(Collectors.toList());
+
+        return responses;
+    }
+    private SchoolAdminResponse mapToSchoolAdminResponse(SchoolAdmin schoolAdmin) {
+        SchoolAdminResponse response = new SchoolAdminResponse();
+        response.setEmail(schoolAdmin.getEmail());
+        response.setFullName(schoolAdmin.getFullName());
+
+        return response;
     }
 
-    public SchoolAdmin findSchoolAdminById(Long schoolAdminId) {
-        return schoolAdminRepository.findById(schoolAdminId)
+    public SchoolAdminResponse findSchoolAdminById(Long schoolAdminId) {
+        SchoolAdmin schoolAdmin = schoolAdminRepository.findById(schoolAdminId)
                 .orElseThrow(() -> new RuntimeException("Администратор школы не найден"));
+
+        return new SchoolAdminResponse(schoolAdmin.getFullName(), schoolAdmin.getEmail());
     }
 
-    public SchoolAdminResponse getSchoolAdminDetails(Long schoolAdminId) {
-        SchoolAdmin schoolAdmin = findSchoolAdminById(schoolAdminId);
 
-        return new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName());
+    public SchoolAdminResponse look(String schoolAdminEmail) {
+        Optional<SchoolAdmin> optionalSchoolAdmin = schoolAdminRepository.findByEmail(schoolAdminEmail);
+
+        if (optionalSchoolAdmin.isPresent()) {
+            SchoolAdmin schoolAdmin = optionalSchoolAdmin.get();
+            return new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName());
+        } else {
+            return null;
+        }
+    }
+    @Transactional
+    public String deleteSchoolAdmins(List<Long> schoolAdminIds) {
+        schoolAdminRepository.findAllById(schoolAdminIds)
+                .forEach(schoolAdmin -> {
+                    schoolAdmin.getRequestSchoolAdmins().forEach(requestSchoolAdmin -> requestSchoolAdmin.setSchoolAdmin(null));
+
+                    User user = schoolAdmin.getUser();
+                    if (user != null) {
+                        user.setSchoolAdmin(null);
+                        userRepository.deleteById(user.getId());
+                    }
+                });
+
+        schoolAdminRepository.deleteInBatch(schoolAdminRepository.findAllById(schoolAdminIds));
+
+        return "Администраторы школы успешно удалены.";
     }
 }

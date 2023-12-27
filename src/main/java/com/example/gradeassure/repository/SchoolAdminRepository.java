@@ -1,5 +1,6 @@
 package com.example.gradeassure.repository;
 
+import com.example.gradeassure.dto.Response.SchoolAdminResponse;
 import com.example.gradeassure.model.SchoolAdmin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +19,6 @@ public interface SchoolAdminRepository extends JpaRepository<SchoolAdmin, Long> 
 
     @Query("SELECT sa FROM SchoolAdmin sa WHERE sa.blocked = false OR sa.blocked IS NULL")
     List<SchoolAdmin> findAllUnblockedSchoolAdmins();
+
+
 }

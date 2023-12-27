@@ -13,4 +13,7 @@ public class SchoolAdminResponse {
         this.fullName = fullName;
         this.email = email;
     }
+
+    public SchoolAdminResponse() {
+    }
 }
