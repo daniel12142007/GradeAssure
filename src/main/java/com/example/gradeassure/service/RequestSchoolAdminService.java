@@ -2,6 +2,7 @@ package com.example.gradeassure.service;
 
 import com.example.gradeassure.dto.response.RequestSchoolAdminResponse;
 import com.example.gradeassure.dto.response.SchoolAdminResponse;
+import com.example.gradeassure.dto.response.RequestSchoolAdminResponse;
 import com.example.gradeassure.model.RequestSchoolAdmin;
 import com.example.gradeassure.model.SchoolAdmin;
 import com.example.gradeassure.model.User;
@@ -43,13 +44,13 @@ public class RequestSchoolAdminService {
         schoolAdmin.setEmail(currentUser.getEmail());
         schoolAdmin.setFullName(currentUser.getFullName());
         schoolAdmin.setUser(currentUser);
-
         schoolAdminRepository.save(schoolAdmin);
 
         if (schoolAdmin == null) {
             throw new AccessDeniedException("Текущий пользователь не является администратором школы");
         }
 
+        // Проверьте, отправлял ли администратор школы запрос ранее
         if (requestRepository.countBySchoolAdminAndAnsweredFalse(schoolAdmin).orElse(0L) >= 2) {
             throw new IllegalStateException("Вы не можете отправить более двух запросов.");
         }
