@@ -1,8 +1,10 @@
 package com.example.gradeassure.api;
 
+import com.example.gradeassure.dto.response.BlockedSchoolAdminResponse;
 import com.example.gradeassure.dto.response.SchoolAdminResponse;
 import com.example.gradeassure.service.RequestSchoolAdminService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -67,5 +69,19 @@ public class RequestAdminApi {
     public ResponseEntity<String> deleteSchoolAdmins(@RequestBody List<Long> schoolAdminIds) {
         requestSchoolAdminService.deleteSchoolAdmins(schoolAdminIds);
         return ResponseEntity.ok("school admins deleted");
+    }
+
+
+    @GetMapping("/unblock")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<List<BlockedSchoolAdminResponse>> getBlockedSchoolAdminsByIds(@RequestParam List<Long> adminIds) {
+        List<BlockedSchoolAdminResponse> blockedAdmins = requestSchoolAdminService.getBlockedSchoolAdminsByIds(adminIds);
+        return new ResponseEntity<>(blockedAdmins, HttpStatus.OK);
+    }
+
+    @GetMapping("/blocked")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public List<SchoolAdminResponse> getAllBlockedSchoolAdmins() {
+        return requestSchoolAdminService.getAllBlockedSchoolAdmins();
     }
 }

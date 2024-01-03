@@ -19,5 +19,6 @@ public interface SchoolAdminRepository extends JpaRepository<SchoolAdmin, Long> 
     @Query("SELECT sa FROM SchoolAdmin sa WHERE sa.blocked = false OR sa.blocked IS NULL")
     List<SchoolAdmin> findAllUnblockedSchoolAdmins();
 
-
+    @Query("SELECT sa FROM SchoolAdmin sa WHERE sa.blocked = true")
+    List<SchoolAdmin> findAllBlockedSchoolAdmins();
 }

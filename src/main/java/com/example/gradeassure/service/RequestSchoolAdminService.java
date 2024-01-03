@@ -1,5 +1,6 @@
 package com.example.gradeassure.service;
 
+import com.example.gradeassure.dto.response.BlockedSchoolAdminResponse;
 import com.example.gradeassure.dto.response.RequestSchoolAdminResponse;
 import com.example.gradeassure.dto.response.SchoolAdminResponse;
 import com.example.gradeassure.dto.response.RequestSchoolAdminResponse;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -127,6 +129,7 @@ public class RequestSchoolAdminService {
                 .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName()))
                 .collect(Collectors.toList());
     }
+
     public List<SchoolAdminResponse> blockSchoolAdmins(List<Long> schoolAdminIds) {
         List<SchoolAdmin> schoolAdmins = schoolAdminRepository.findAllById(schoolAdminIds);
 
@@ -149,6 +152,7 @@ public class RequestSchoolAdminService {
 
         return responses;
     }
+
     private SchoolAdminResponse mapToSchoolAdminResponse(SchoolAdmin schoolAdmin) {
         SchoolAdminResponse response = new SchoolAdminResponse();
         response.setEmail(schoolAdmin.getEmail());
@@ -175,12 +179,12 @@ public class RequestSchoolAdminService {
             return null;
         }
     }
+
     @Transactional
     public String deleteSchoolAdmins(List<Long> schoolAdminIds) {
         schoolAdminRepository.findAllById(schoolAdminIds)
                 .forEach(schoolAdmin -> {
                     schoolAdmin.getRequestSchoolAdmins().forEach(requestSchoolAdmin -> requestSchoolAdmin.setSchoolAdmin(null));
-
                     User user = schoolAdmin.getUser();
                     if (user != null) {
                         user.setSchoolAdmin(null);
@@ -191,5 +195,33 @@ public class RequestSchoolAdminService {
         schoolAdminRepository.deleteInBatch(schoolAdminRepository.findAllById(schoolAdminIds));
 
         return "Администраторы школы успешно удалены.";
+    }
+
+    public List<BlockedSchoolAdminResponse> getBlockedSchoolAdminsByIds(List<Long> adminIds) {
+        List<BlockedSchoolAdminResponse> blockedAdminResponses = schoolAdminRepository.findAllById(adminIds).stream()
+                .filter(SchoolAdmin::isBlocked)
+                .map(schoolAdmin -> {
+                    schoolAdmin.setBlocked(false);
+                    schoolAdminRepository.save(schoolAdmin);
+                    User user = userRepository.findByEmail(schoolAdmin.getEmail()).orElseThrow();
+                    user.setRole(Role.ADMINSCHOOL);
+                    userRepository.save(user);
+                    BlockedSchoolAdminResponse response = new BlockedSchoolAdminResponse();
+                    response.setId(schoolAdmin.getId());
+                    response.setFullName(schoolAdmin.getFullName());
+                    response.setEmail(schoolAdmin.getEmail());
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return blockedAdminResponses;
+    }
+
+    public List<SchoolAdminResponse> getAllBlockedSchoolAdmins() {
+        List<SchoolAdmin> blockedSchoolAdmins = schoolAdminRepository.findAllBlockedSchoolAdmins();
+
+        return blockedSchoolAdmins.stream()
+                .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName()))
+                .collect(Collectors.toList());
     }
 }
