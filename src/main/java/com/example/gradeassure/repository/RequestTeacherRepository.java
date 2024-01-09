@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Repository
@@ -23,10 +24,12 @@ public interface RequestTeacherRepository extends JpaRepository<RequestTeacher, 
     @Query("""
             select r
             from RequestTeacher r
-            where r.teacher.id = :id
-            and r.dateAnswered is null
+            where r.teacher.email = :email
+            and r.answered = true
+            and r.action = 0
             """)
-    List<RequestTeacher> findRequestByTeacherId(@Param(value = "id") Long id);
+//            and r.testTeacher = null
+    RequestTeacher findRequestByTeacherId(@Param(value = "email") String email);
 
     @Query("select r from RequestTeacher r where r.teacher.id = :id and r.action = 0 and r.dateAnswered = null")
     RequestTeacher findRequestCreate(@Param(value = "id") Long id);

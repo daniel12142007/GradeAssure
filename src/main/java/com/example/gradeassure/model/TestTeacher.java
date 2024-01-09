@@ -1,6 +1,9 @@
 package com.example.gradeassure.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -8,6 +11,9 @@ import java.util.List;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class TestTeacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
