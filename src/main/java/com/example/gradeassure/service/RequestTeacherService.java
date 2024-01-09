@@ -1,5 +1,6 @@
 package com.example.gradeassure.service;
 
+import com.example.gradeassure.dto.response.RequestTeacherForAllResponse;
 import com.example.gradeassure.dto.response.RequestTeacherResponse;
 import com.example.gradeassure.model.RequestTeacher;
 import com.example.gradeassure.model.Teacher;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,5 +38,9 @@ public class RequestTeacherService {
                 .action(Action.CREATE)
                 .dateCreated(requestTeacher.getDateCreated())
                 .build();
+    }
+
+    public List<RequestTeacherForAllResponse> findAllRequest() {
+        return teacherRepository.findAllRequestTeacher();
     }
 }

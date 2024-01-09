@@ -8,8 +8,6 @@ import javax.persistence.Id;
 
 @Data
 public class OptionsTeacherResponse {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String option;
     private String letter;

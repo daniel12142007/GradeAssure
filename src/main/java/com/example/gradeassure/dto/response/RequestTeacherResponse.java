@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class RequestTeacherResponse {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Action action;
     private String subject;
