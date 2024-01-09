@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +42,19 @@ public class RequestTeacherService {
     }
 
     public List<RequestTeacherForAllResponse> findAllRequest() {
+        return teacherRepository.findAllRequestTeacher();
+    }
+
+    public List<RequestTeacherForAllResponse> refuseByIdAll(List<Long> teacherId) {
+        List<RequestTeacher> list = requestTeacherRepository.findAllRequestByTeacherId(teacherId).stream().map(
+                requestTeacher -> {
+                    requestTeacher.setDateAnswered(LocalDateTime.now());
+                    requestTeacher.setDateDeadline(LocalDateTime.now());
+                    requestTeacher.setAnswered(false);
+                    return requestTeacher;
+                }
+        ).toList();
+        requestTeacherRepository.saveAll(list);
         return teacherRepository.findAllRequestTeacher();
     }
 }

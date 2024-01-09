@@ -1,6 +1,7 @@
 package com.example.gradeassure.api;
 
 import com.example.gradeassure.dto.response.RequestTeacherForAllResponse;
+import com.example.gradeassure.dto.response.RequestTeacherResponse;
 import com.example.gradeassure.service.RequestSchoolAdminService;
 import com.example.gradeassure.service.RequestTeacherService;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,10 @@ public class RequestSchoolAdminApi {
     @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
     public List<RequestTeacherForAllResponse> findAllRequestTeacher() {
         return requestTeacherService.findAllRequest();
+    }
+
+    @PutMapping("refuse/request/teacher")
+    public List<RequestTeacherForAllResponse> refuseRequestTeacher(@RequestParam List<Long> ids) {
+        return requestTeacherService.refuseByIdAll(ids);
     }
 }
