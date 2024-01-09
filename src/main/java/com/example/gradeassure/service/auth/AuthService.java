@@ -1,109 +1,114 @@
 package com.example.gradeassure.service.auth;
 
 import com.example.gradeassure.config.JwtUtils;
-import com.example.gradeassure.dto.request.RegisterUserRequest;
+import com.example.gradeassure.dto.request.RegisterRequest;
 import com.example.gradeassure.dto.response.JWTResponse;
+import com.example.gradeassure.model.SchoolAdmin;
+import com.example.gradeassure.model.Student;
+import com.example.gradeassure.model.Teacher;
 import com.example.gradeassure.model.User;
 import com.example.gradeassure.model.enums.Role;
+import com.example.gradeassure.repository.SchoolAdminRepository;
+import com.example.gradeassure.repository.StudentRepository;
+import com.example.gradeassure.repository.TeacherRepository;
 import com.example.gradeassure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
-    private final JavaMailSender javaMailSender;
-
-    private final UserRepository userRepository;
-    private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final JavaMailSender javaMailSender;
+    private final JwtUtils jwtUtils;
+    private final TeacherRepository teacherRepository;
+    private final SchoolAdminRepository schoolAdminRepository;
+    private final StudentRepository studentRepository;
 
-
-    public JWTResponse login(String email, String password) {
+    public JWTResponse register(RegisterRequest request) {
+        User user = User.builder()
+                .role(Role.USER)
+                .email(request.getEmail())
+                .fullName(request.getFullName())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
+        if (userRepository.existsByEmail(request.getEmail()))
+            throw new RuntimeException("Вы уже зарегистрированы email: " + request.getEmail());
         try {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found for email: " + email));
+            Random random = new Random();
+            String code = String.valueOf(random.nextInt(99)) + String.valueOf(random.nextInt(99)) + String.valueOf(random.nextInt(99));
+            SimpleMailMessage message = new SimpleMailMessage();
+            System.out.println(code);
+            message.setTo(request.getEmail());
+            message.setSubject("Код:" + code);
+            message.setText("Не кому не показывайте этот код");
+            javaMailSender.send(message);
+            user.setCode(code);
+        } catch (Exception e) {
+            throw new RuntimeException("Ваш email не найден");
+        }
+        userRepository.save(user);
+        Role role = roles(user, String.valueOf(request.getRoleRequest()));
+        return new JWTResponse(
+                user.getEmail(),
+                jwtUtils.generateToken(user.getEmail()),
+                "register",
+                role
+        );
+    }
 
-            if (!passwordEncoder.matches(password, user.getPassword())) {
-                throw new BadCredentialsException("Invalid password");
-            }
-
-            String token = jwtUtils.generateToken(user.getEmail());
-
-            return new JWTResponse(
-                    "CUSTOM " + user.getEmail(),
-                    token,
-                    "login",
-                    user.getRole()
-            );
-        } catch (UsernameNotFoundException | BadCredentialsException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new RuntimeException("Internal Server Error");
+    private Role roles(User user, String role) {
+        if (Role.valueOf(role) == Role.TEACHER) {
+            Teacher teacher = Teacher.builder()
+                    .user(user)
+                    .email(user.getEmail())
+                    .fullName(user.getFullName())
+                    .blocked(false)
+                    .build();
+            teacherRepository.save(teacher);
+            return Role.TEACHER;
+        } else if (Role.valueOf(role) == Role.STUDENT) {
+            Student student = Student.builder()
+                    .user(user)
+                    .email(user.getEmail())
+                    .blocked(false)
+                    .fullName(user.getFullName())
+                    .build();
+            studentRepository.save(student);
+            return Role.STUDENT;
+        } else if (user.getSchoolAdmin() != null || user.getStudent() != null || user.getTeacher() != null) {
+            throw new RuntimeException("Вы уже зарегистрированы");
+        } else {
+            SchoolAdmin schoolAdmin = SchoolAdmin.builder()
+                    .user(user)
+                    .email(user.getEmail())
+                    .blocked(false)
+                    .fullName(user.getFullName())
+                    .build();
+            schoolAdminRepository.save(schoolAdmin);
+            return Role.ADMINSCHOOL;
         }
     }
 
-
-    public JWTResponse register(RegisterUserRequest request) {
-        User user = new User();
-        check(request.getPassword());
-        String code = generateRandomPassword();
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(request.getEmail());
-        message.setSubject("Code : " + code);
-        message.setText("Сброс пароля");
-        javaMailSender.send(message);
-        user.setEmail(request.getEmail());
-        user.setCode(code);
-        user.setFullName(request.getFullName());
-        user.setRole(Role.USER);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        if (userRepository.existsByEmail(request.getEmail()))
-            throw new RuntimeException("found email:" + request.getEmail() + " email");
-        userRepository.save(user);
+    public JWTResponse login(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("email не найден: " + email));
+        if (!passwordEncoder.matches(password, user.getPassword()))
+            throw new BadCredentialsException("Пароль неверный");
         String token = jwtUtils.generateToken(user.getEmail());
         return new JWTResponse(
                 user.getEmail(),
                 token,
-                "register",
+                "login",
                 user.getRole()
         );
-    }
-
-
-    private boolean check(String password) {
-        if (!isLengthValid(password)) {
-            throw new RuntimeException(("Пароль должен быть хотя бы 6 символов"));
-        } else if (!containsUpperCase(password)) {
-            throw new RuntimeException(("Пароль должен содержать хотя бы 1 заглавную букву"));
-        } else if (!containsDigit(password)) {
-            throw new RuntimeException(("Пароль должен содержать хотя бы 1 цифру"));
-        }
-        return true;
-    }
-
-    private String generateRandomPassword() {
-        Random random = new Random();
-        return random.nextInt(0, 9) + "" + random.nextInt(0, 9) + "" + random.nextInt(0, 9) + "" + random.nextInt(0, 9) + "" + random.nextInt(0, 9) + "" + random.nextInt(0, 9);
-    }
-
-    private boolean isLengthValid(String password) {
-        return password.length() >= 6;
-    }
-
-    private boolean containsUpperCase(String password) {
-        return !password.equals(password.toLowerCase());
-    }
-
-    private boolean containsDigit(String password) {
-        return password.chars().anyMatch(Character::isDigit);
     }
 }
