@@ -41,6 +41,7 @@ public class RequestSchoolAdminApi {
     }
 
     @PutMapping("block/teacher")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
     public List<RequestTeacherForAllResponse> block(@RequestParam List<Long> teacherId) {
         return requestTeacherService.blockedTeacher(teacherId);
     }
