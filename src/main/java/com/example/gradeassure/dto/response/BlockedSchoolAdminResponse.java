@@ -6,7 +6,6 @@ import javax.persistence.Id;
 
 @Data
 public class BlockedSchoolAdminResponse {
-    @Id
     private Long id;
     private String fullName;
     private String email;

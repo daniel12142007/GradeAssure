@@ -1,30 +1,48 @@
 package com.example.gradeassure.api;
 
-import com.example.gradeassure.dto.request.RegisterUserRequest;
+import com.example.gradeassure.dto.request.RegisterRequest;
 import com.example.gradeassure.dto.response.JWTResponse;
 import com.example.gradeassure.dto.response.UserResponse;
 import com.example.gradeassure.service.UserService;
 import com.example.gradeassure.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.PermitAll;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+@Validated
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("api/v1/auth")
 public class AuthApi {
 
     private final UserService userService;
     private final AuthService authService;
 
-    @PostMapping("login")
-    public JWTResponse login(@RequestParam String email,@RequestParam String password){
-        return authService.login(email,password);
-    }
-
-    @PostMapping("register")
-    public JWTResponse register(@RequestBody RegisterUserRequest request) {
+    @PostMapping("/register")
+    @PermitAll
+    public JWTResponse register(
+            @RequestBody @Valid RegisterRequest request) {
         return authService.register(request);
     }
-
+    @PostMapping("/login")
+    @PermitAll
+    public JWTResponse login(@RequestParam
+                             @Pattern(regexp = ".*@gmail.com$")
+                             @NotEmpty(message = "It is empty")
+                             String email,
+                             @RequestParam
+                             @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)[A-Za-z\\d]{8,}$", message = "The password does not meet the conditions")
+                             @Size(min = 8, message = "The line length must be at least 8 characters.")
+                             @NotEmpty(message = "It is empty")
+                             String password) {
+        return authService.login(email, password);
+    }
     @GetMapping("sendcode")
     public UserResponse mars(@RequestParam String email) {
         return userService.send(email);
