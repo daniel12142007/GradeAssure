@@ -28,15 +28,20 @@ public class RequestSchoolAdminApi {
         return requestTeacherService.allowById(id);
     }
 
+    @PostMapping("refuse/request/teacher")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
+    public List<RequestTeacherForAllResponse> refuseRequestTeacher(@RequestParam List<Long> ids) {
+        return requestTeacherService.refuseByIdAll(ids);
+    }
+
     @GetMapping("find/all/request/teacher")
     @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
     public List<RequestTeacherForAllResponse> findAllRequestTeacher() {
         return requestTeacherService.findAllRequest();
     }
 
-    @PutMapping("refuse/request/teacher")
-    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
-    public List<RequestTeacherForAllResponse> refuseRequestTeacher(@RequestParam List<Long> ids) {
-        return requestTeacherService.refuseByIdAll(ids);
+    @PutMapping("block/teacher")
+    public List<RequestTeacherForAllResponse> block(@RequestParam List<Long> teacherId) {
+        return requestTeacherService.blockedTeacher(teacherId);
     }
 }

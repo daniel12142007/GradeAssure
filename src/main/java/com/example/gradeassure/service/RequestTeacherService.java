@@ -4,7 +4,9 @@ import com.example.gradeassure.dto.response.RequestTeacherForAllResponse;
 import com.example.gradeassure.dto.response.RequestTeacherResponse;
 import com.example.gradeassure.model.RequestTeacher;
 import com.example.gradeassure.model.Teacher;
+import com.example.gradeassure.model.User;
 import com.example.gradeassure.model.enums.Action;
+import com.example.gradeassure.model.enums.Role;
 import com.example.gradeassure.repository.RequestTeacherRepository;
 import com.example.gradeassure.repository.TeacherRepository;
 import com.example.gradeassure.repository.UserRepository;
@@ -24,7 +26,7 @@ public class RequestTeacherService {
 
     public RequestTeacherResponse sendRequestCreate(String email, String subject, int days) {
         Teacher teacher = teacherRepository.findByEmail(email).orElseThrow(RuntimeException::new);
-        if(requestTeacherRepository.findRequestCreate(teacher.getId())!=null)
+        if (requestTeacherRepository.findRequestCreate(teacher.getId()) != null)
             throw new RuntimeException("Вы уже отправили запрос");
         RequestTeacher requestTeacher = RequestTeacher.builder()
                 .days(days)
@@ -66,6 +68,28 @@ public class RequestTeacherService {
         requestTeacher.setDateDeadline(LocalDateTime.now().plusDays(requestTeacher.getDays()));
         requestTeacher.setAnswered(true);
         requestTeacherRepository.save(requestTeacher);
+        return teacherRepository.findAllRequestTeacher();
+    }
+
+    public List<RequestTeacherForAllResponse> blockedTeacher(List<Long> teacherId) {
+        List<RequestTeacher> list = requestTeacherRepository.findAllRequestByTeacherId(teacherId).stream().map(
+                requestTeacher -> {
+                    requestTeacher.setDateAnswered(LocalDateTime.now());
+                    requestTeacher.setDateDeadline(LocalDateTime.now());
+                    requestTeacher.setAnswered(false);
+                    return requestTeacher;
+                }
+        ).toList();
+        requestTeacherRepository.saveAll(list);
+        teacherRepository.saveAll(teacherRepository.findAllById(teacherId).stream().map(
+                teacher -> {
+                    teacher.setBlocked(true);
+                    User user = teacher.getUser();
+                    user.setRole(Role.BLOCKED);
+                    userRepository.save(user);
+                    return teacher;
+                }
+        ).toList());
         return teacherRepository.findAllRequestTeacher();
     }
 }

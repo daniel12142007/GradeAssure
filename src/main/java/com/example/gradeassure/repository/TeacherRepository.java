@@ -25,6 +25,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
             on requestCreate.answered = false and requestCreate.dateAnswered = null and requestCreate.action = 0
             left join t.requestTeachers requestCheck
             on requestCheck.answered = false and requestCheck.dateAnswered = null and requestCheck.action = 1
+            where t.blocked = false
             """)
     List<RequestTeacherForAllResponse> findAllRequestTeacher();
 }
