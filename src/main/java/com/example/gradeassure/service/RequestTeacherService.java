@@ -24,6 +24,8 @@ public class RequestTeacherService {
 
     public RequestTeacherResponse sendRequestCreate(String email, String subject, int days) {
         Teacher teacher = teacherRepository.findByEmail(email).orElseThrow(RuntimeException::new);
+        if(requestTeacherRepository.findRequestCreate(teacher.getId())!=null)
+            throw new RuntimeException("Вы уже отправили запрос");
         RequestTeacher requestTeacher = RequestTeacher.builder()
                 .days(days)
                 .subject(subject)
@@ -55,6 +57,15 @@ public class RequestTeacherService {
                 }
         ).toList();
         requestTeacherRepository.saveAll(list);
+        return teacherRepository.findAllRequestTeacher();
+    }
+
+    public List<RequestTeacherForAllResponse> allowById(Long requestCreate) {
+        RequestTeacher requestTeacher = requestTeacherRepository.findById(requestCreate).orElseThrow(RuntimeException::new);
+        requestTeacher.setDateAnswered(LocalDateTime.now());
+        requestTeacher.setDateDeadline(LocalDateTime.now().plusDays(requestTeacher.getDays()));
+        requestTeacher.setAnswered(true);
+        requestTeacherRepository.save(requestTeacher);
         return teacherRepository.findAllRequestTeacher();
     }
 }

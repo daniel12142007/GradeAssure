@@ -22,6 +22,12 @@ public class RequestSchoolAdminApi {
         requestSchoolAdminService.processRequestSchoolAdmin(days);
     }
 
+    @PostMapping("allow/request/teacher")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
+    public List<RequestTeacherForAllResponse> allowRequestTeacher(@RequestParam Long id) {
+        return requestTeacherService.allowById(id);
+    }
+
     @GetMapping("find/all/request/teacher")
     @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
     public List<RequestTeacherForAllResponse> findAllRequestTeacher() {
@@ -29,6 +35,7 @@ public class RequestSchoolAdminApi {
     }
 
     @PutMapping("refuse/request/teacher")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
     public List<RequestTeacherForAllResponse> refuseRequestTeacher(@RequestParam List<Long> ids) {
         return requestTeacherService.refuseByIdAll(ids);
     }
