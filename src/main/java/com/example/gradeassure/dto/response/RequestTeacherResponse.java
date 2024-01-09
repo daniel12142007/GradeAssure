@@ -1,7 +1,10 @@
 package com.example.gradeassure.dto.response;
 
 import com.example.gradeassure.model.enums.Action;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,6 +12,9 @@ import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class RequestTeacherResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
