@@ -25,8 +25,10 @@ public class TestTeacherService {
     public TestTeacherResponse createTestTeacher(String email, String testName) {
         Teacher teacher = teacherRepository.findByEmail(email).orElseThrow(RuntimeException::new);
         RequestTeacher requestTeacher = requestTeacherRepository.findRequestByTeacherId(email);
-       if (requestTeacher.getTestTeacher()!=null)
-           throw new RuntimeException("Teacher уже создал тест");
+        if (testTeacherRepository.existsByName(testName))
+            throw new RuntimeException("Такое название теста уже существует");
+        if (requestTeacher.getTestTeacher() != null)
+            throw new RuntimeException("Teacher уже создал тест");
         TestTeacher testTeacher = TestTeacher.builder()
                 .name(testName)
                 .teacher(teacher)
