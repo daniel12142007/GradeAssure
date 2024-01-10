@@ -5,17 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OptionsTeacherResponse {
+public class RequestTeacherForAllResponse {
     private Long id;
-    private String option;
-    private String letter;
-    private Boolean correct;
+    private String email;
+    private Long create;
+    private Long check;
 }

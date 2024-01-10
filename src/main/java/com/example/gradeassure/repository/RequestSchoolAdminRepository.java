@@ -23,4 +23,8 @@ public interface RequestSchoolAdminRepository extends JpaRepository<RequestSchoo
     List<RequestSchoolAdmin> findBySchoolAdminBlockedFalseAndDateDeadlineBeforeAndAnsweredFalse(
             LocalDateTime currentDateTime
     );
+
+    @Query("SELECT sa FROM SchoolAdmin sa WHERE sa.blocked = true")
+    List<SchoolAdmin> findBlockedSchoolAdmins();
 }
+
