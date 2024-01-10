@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 public class QuestionTeacherRequest {
-    private String name;
+    private String question;
     private AnswerFormat answerFormat;
+    private int numberOption;
     private int points;
 }
