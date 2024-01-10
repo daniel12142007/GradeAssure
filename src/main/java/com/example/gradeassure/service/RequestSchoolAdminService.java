@@ -224,4 +224,6 @@ public class RequestSchoolAdminService {
                 .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName()))
                 .collect(Collectors.toList());
     }
+
+
 }
