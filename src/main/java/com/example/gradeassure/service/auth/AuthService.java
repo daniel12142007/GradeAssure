@@ -40,8 +40,8 @@ public class AuthService {
 
             return new JWTResponse(
                     "CUSTOM " + user.getEmail(),
-                    token,
-                    "login",
+                        token,
+                        "login",
                     user.getRole()
             );
         } catch (UsernameNotFoundException | BadCredentialsException ex) {
