@@ -36,7 +36,7 @@ public class TeacherService {
         return "Учителя успешно удалены.";
     }
 
-    public List<BlockedSchoolAdminResponse> getBlockedTeachersByIds(List<Long> teacherIds) {
+    public List<BlockedSchoolAdminResponse> getUnBlockedTeachersByIds(List<Long> teacherIds) {
         List<BlockedSchoolAdminResponse> blockedTeacherResponses = teacherRepository.findAllById(teacherIds).stream()
                 .filter(Teacher::isBlocked)
                 .map(teacher -> {

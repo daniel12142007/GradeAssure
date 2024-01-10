@@ -32,10 +32,9 @@ public class StudentService {
                 });
 
         studentRepository.deleteInBatch(studentRepository.findAllById(studentIds));
-
         return "Ученики успешно удалены.";
     }
-    public List<BlockedSchoolAdminResponse> getBlockedStudentsByIds(List<Long> studentIds) {
+    public List<BlockedSchoolAdminResponse> getUnBlockedStudentsByIds(List<Long> studentIds) {
         List<BlockedSchoolAdminResponse> blockedStudentResponses = studentRepository.findAllById(studentIds).stream()
                 .filter(Student::isBlocked)
                 .map(student -> {

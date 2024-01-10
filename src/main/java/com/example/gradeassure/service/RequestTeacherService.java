@@ -1,8 +1,5 @@
 package com.example.gradeassure.service;
 
-import com.example.gradeassure.model.User;
-import com.example.gradeassure.repository.TeacherRepository;
-import com.example.gradeassure.repository.UserRepository;
 import com.example.gradeassure.dto.response.RequestTeacherForAllResponse;
 import com.example.gradeassure.dto.response.RequestTeacherResponse;
 import com.example.gradeassure.model.RequestTeacher;
@@ -16,17 +13,12 @@ import com.example.gradeassure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.List;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RequestTeacherService {
-}
     private final UserRepository userRepository;
     private final TeacherRepository teacherRepository;
     private final RequestTeacherRepository requestTeacherRepository;
