@@ -22,6 +22,8 @@ public class Student {
     private String email;
     private boolean blocked;
 
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List<RequestStudent> requestStudents;
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

@@ -10,4 +10,7 @@ import javax.transaction.Transactional;
 @Repository
 public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> {
     boolean existsByName(String name);
+
+    TestTeacher findByName(String name);
+
 }

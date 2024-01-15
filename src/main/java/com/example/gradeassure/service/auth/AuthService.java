@@ -1,8 +1,12 @@
 package com.example.gradeassure.service.auth;
 
 import com.example.gradeassure.config.JwtUtils;
+import com.example.gradeassure.dto.request.RegisterRequest;
 import com.example.gradeassure.dto.request.RegisterUserRequest;
 import com.example.gradeassure.dto.response.JWTResponse;
+import com.example.gradeassure.model.SchoolAdmin;
+import com.example.gradeassure.model.Student;
+import com.example.gradeassure.model.Teacher;
 import com.example.gradeassure.model.User;
 import com.example.gradeassure.model.enums.Role;
 import com.example.gradeassure.repository.SchoolAdminRepository;
