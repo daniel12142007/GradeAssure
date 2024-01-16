@@ -19,7 +19,7 @@ public class RequestStudentApi {
     public RequestStudentResponse requestStudentResponse(@RequestParam String email, @RequestParam int days, @RequestParam String testName) {
         return requestStudentService.studentRequest(email,days,testName);
     }
-    @GetMapping("/studentRequest")
+    @GetMapping("/findAllStudentRequests")
     public List <RequestStudentFindAllResponse> response(){
         return requestStudentService.findAllRequestStudent();
     }
