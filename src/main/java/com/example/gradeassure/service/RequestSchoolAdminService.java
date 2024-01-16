@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 public class RequestSchoolAdminService {
 
-    private final RequestSchoolAdminRepository requestRepository;
+    private final RequestSchoolAdminRepository requestSchoolAdminRepository;
     private final SchoolAdminRepository schoolAdminRepository;
     private final UserRepository userRepository;
 
@@ -53,7 +53,7 @@ public class RequestSchoolAdminService {
         }
 
         // Проверьте, отправлял ли администратор школы запрос ранее
-        if (requestRepository.countBySchoolAdminAndAnsweredFalse(schoolAdmin).orElse(0L) >= 2) {
+        if (requestSchoolAdminRepository.countBySchoolAdminAndAnsweredFalse(schoolAdmin).orElse(0L) >= 2) {
             throw new IllegalStateException("Вы не можете отправить более двух запросов.");
         }
 
@@ -62,7 +62,7 @@ public class RequestSchoolAdminService {
         request.setDateCreated(LocalDateTime.now());
         request.setSchoolAdmin(schoolAdmin);
 
-        requestRepository.save(request);
+        requestSchoolAdminRepository.save(request);
 
         RequestSchoolAdminResponse response = new RequestSchoolAdminResponse();
         response.setId(request.getId());
@@ -74,7 +74,7 @@ public class RequestSchoolAdminService {
     }
 
     public String approveRequests(List<Long> requestIds) {
-        List<RequestSchoolAdmin> requests = requestRepository.findAllById(requestIds);
+        List<RequestSchoolAdmin> requests = requestSchoolAdminRepository.findAllById(requestIds);
 
         requests.stream()
                 .filter(request -> !request.isAnswered())
@@ -87,13 +87,13 @@ public class RequestSchoolAdminService {
                     user.setRole(Role.ADMINSCHOOL);
                 });
 
-        requestRepository.saveAll(requests);
+        requestSchoolAdminRepository.saveAll(requests);
 
         return "Выбранные запросы одобрены.";
     }
 
     public String rejectRequests(List<Long> requestIds) {
-        List<RequestSchoolAdmin> requests = requestRepository.findAllById(requestIds);
+        List<RequestSchoolAdmin> requests = requestSchoolAdminRepository.findAllById(requestIds);
 
         requests.stream()
                 .filter(request -> !request.isAnswered())
@@ -102,7 +102,7 @@ public class RequestSchoolAdminService {
                     request.setDateAnswered(LocalDateTime.now());
                 });
 
-        requestRepository.saveAll(requests);
+        requestSchoolAdminRepository.saveAll(requests);
 
         return "Выбранные запросы отклонены.";
     }
@@ -110,7 +110,7 @@ public class RequestSchoolAdminService {
     @Scheduled(cron = "0 0 0 * * *")
     public void checkDeadlinesForSchoolAdmin() {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        List<RequestSchoolAdmin> overdueRequests = requestRepository
+        List<RequestSchoolAdmin> overdueRequests = requestSchoolAdminRepository
                 .findBySchoolAdminBlockedFalseAndDateDeadlineBeforeAndAnsweredFalse(currentDateTime);
         overdueRequests.forEach(request -> {
             SchoolAdmin schoolAdmin = request.getSchoolAdmin();
@@ -119,7 +119,7 @@ public class RequestSchoolAdminService {
             request.setOverdue(true);
         });
 
-        requestRepository.saveAll(overdueRequests);
+        requestSchoolAdminRepository.saveAll(overdueRequests);
     }
 
     public List<SchoolAdminResponse> getAllUnblockedSchoolAdmins() {
@@ -224,6 +224,5 @@ public class RequestSchoolAdminService {
                 .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName()))
                 .collect(Collectors.toList());
     }
-
 
 }
