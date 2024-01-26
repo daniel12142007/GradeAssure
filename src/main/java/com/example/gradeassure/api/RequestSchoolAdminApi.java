@@ -79,6 +79,4 @@ public class RequestSchoolAdminApi {
         List<BlockedSchoolAdminResponse> unblockedStudents = studentService.getUnBlockedStudentsByIds(studentsIds);
         return new ResponseEntity<>(unblockedStudents, HttpStatus.OK);
     }
-
-
 }

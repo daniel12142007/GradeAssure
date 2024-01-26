@@ -28,7 +28,6 @@ public interface RequestTeacherRepository extends JpaRepository<RequestTeacher, 
             and r.answered = true
             and r.action = 0
             """)
-//            and r.testTeacher = null
     RequestTeacher findRequestByTeacherId(@Param(value = "email") String email);
 
     @Query("select r from RequestTeacher r where r.teacher.id = :id and r.action = 0 and r.dateAnswered = null")
