@@ -17,9 +17,9 @@ public class RequestStudent {
     private LocalDateTime dateAnswered;
     private LocalDateTime dateDeadline;
     private boolean answered;
-
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
     @OneToOne(mappedBy = "requestStudent", cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private TestTeacher teacher;
-
-
 }

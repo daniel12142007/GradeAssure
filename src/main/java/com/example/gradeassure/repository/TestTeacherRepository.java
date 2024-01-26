@@ -15,6 +15,9 @@ import java.util.List;
 public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> {
     boolean existsByName(String name);
 
+    TestTeacher findByName(String name);
+
+
     @Query("""
             select
             new com.example.gradeassure.dto.response.TestForStudentResponse(
@@ -31,8 +34,3 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
     List<TestForStudentResponse> findAllTestResponseForStudent(
             @Param(value = "email") String email);
 }
-//   private Long id;
-//    private boolean access;
-//    private String groupName;
-//    private LocalDateTime dateCreated;
-//    private int passed;
