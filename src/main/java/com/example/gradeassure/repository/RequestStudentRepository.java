@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Transactional
@@ -17,6 +18,9 @@ public interface RequestStudentRepository extends JpaRepository<RequestStudent, 
 
     @Query("select coalesce(case when count(r)=1 then true else false end,false ) from RequestStudent r where r.student.email = :email and r.answered = true ")
     boolean check(@Param(value = "email") String email);
+
+//    @Query("SELECT FUNCTION('DATEDIFF', r.dateAnswered, r.dateDeadline) AS daysDifference FROM RequestStudent r WHERE r.student.email = :email AND r.answered = true")
+//    int dayDeadline(@Param(value = "email") String email);
 
     @Query("""
             select r

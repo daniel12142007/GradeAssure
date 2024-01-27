@@ -25,13 +25,11 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
             coalesce(case when request.dateDeadline > current_date then true else false end, false),
             test.name,
             test.dateCreated,
-            count(request)
+            (select count(i) from TestTeacher testTeacher join testTeacher.requestStudents i where testTeacher.id = test.id)
             )
             from TestTeacher test
             left join test.requestStudents request
-             where request.answered = true
-                    and request.student.email = :email
-                    group by test.id, test.name, test.dateCreated, request.dateDeadline
+            on request.answered = true and request.student.email = :email
             """)
     List<TestForStudentResponse> findAllTestResponseForStudent(
             @Param(value = "email") String email);

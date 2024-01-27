@@ -16,5 +16,5 @@ public class TestForStudentResponse {
     private boolean access;
     private String groupName;
     private LocalDateTime dateCreated;
-    private Long passed;
+    private long passed;
 }

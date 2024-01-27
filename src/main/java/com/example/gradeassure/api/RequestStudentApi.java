@@ -4,6 +4,7 @@ import com.example.gradeassure.dto.response.RequestStudentFindAllResponse;
 import com.example.gradeassure.dto.response.RequestStudentResponse;
 import com.example.gradeassure.service.RequestStudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,11 +18,11 @@ public class RequestStudentApi {
 
     @PostMapping("/requestStudent")
     public RequestStudentResponse requestStudentResponse(@RequestParam String email, @RequestParam int days, @RequestParam String testName) {
-        return requestStudentService.studentRequest(email,days,testName);
-    }
-    @GetMapping("/findAllStudentRequests")
-    public List <RequestStudentFindAllResponse> response(){
-        return requestStudentService.findAllRequestStudent();
+        return requestStudentService.studentRequest(email, days, testName);
     }
 
+    @GetMapping("/findAllStudentRequests")
+    public List<RequestStudentFindAllResponse> response() {
+        return requestStudentService.findAllRequestStudent();
+    }
 }

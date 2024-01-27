@@ -1,6 +1,8 @@
 package com.example.gradeassure.api;
 
 import com.example.gradeassure.dto.response.TestForStudentResponse;
+import com.example.gradeassure.model.RequestStudent;
+import com.example.gradeassure.service.RequestStudentService;
 import com.example.gradeassure.service.TestStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,5 +23,11 @@ public class TestStudentApi {
     @PreAuthorize("hasAnyAuthority('STUDENT')")
     public List<TestForStudentResponse> findAllTestStudent() {
         return testStudentService.findAllTestForStudent(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+
+    @GetMapping("get/day/deadline")
+    @PreAuthorize("hasAnyAuthority('STUDENT')")
+    public long dayDeadline() {
+        return testStudentService.countTime(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 }

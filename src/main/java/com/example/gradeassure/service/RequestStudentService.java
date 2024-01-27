@@ -11,7 +11,10 @@ import com.example.gradeassure.repository.TestTeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,7 @@ public class RequestStudentService {
     private final StudentRepository studentRepository;
     private final TestTeacherRepository teacherRepository;
     private final RequestStudentRepository requestStudentRepository;
+    private final EntityManager entityManager;
 
     public RequestStudentResponse studentRequest(String email, int day, String testName) {
         Student student = studentRepository.findByEmail(email).orElseThrow();
@@ -54,9 +58,6 @@ public class RequestStudentService {
                     return response;
                 })
                 .collect(Collectors.toList());
-
         return responses;
     }
-
-
 }
