@@ -66,6 +66,12 @@ public class RequestTeacherService {
         requestTeacher.setDateAnswered(LocalDateTime.now());
         requestTeacher.setDateDeadline(LocalDateTime.now().plusDays(requestTeacher.getDays()));
         requestTeacher.setAnswered(true);
+        Teacher teacher = requestTeacher.getTeacher();
+        if (requestTeacherRepository.allowTeacher(teacher.getEmail())) {
+            User user = teacher.getUser();
+            user.setRole(Role.TEACHER);
+            userRepository.save(user);
+        }
         requestTeacherRepository.save(requestTeacher);
         return teacherRepository.findAllRequestTeacher();
     }

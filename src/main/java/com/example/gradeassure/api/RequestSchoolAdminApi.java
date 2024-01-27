@@ -1,6 +1,7 @@
 package com.example.gradeassure.api;
 
 import com.example.gradeassure.dto.response.BlockedSchoolAdminResponse;
+import com.example.gradeassure.dto.response.RequestSchoolAdminResponse;
 import com.example.gradeassure.service.*;
 import com.example.gradeassure.dto.response.RequestTeacherForAllResponse;
 import com.example.gradeassure.service.RequestSchoolAdminService;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +26,8 @@ public class RequestSchoolAdminApi {
 
 
     @PostMapping("/process")
-    public void processRequestSchoolAdmin(@RequestParam int days) {
-        requestSchoolAdminService.processRequestSchoolAdmin(days);
+    public RequestSchoolAdminResponse processRequestSchoolAdmin(@RequestParam int days) {
+        return requestSchoolAdminService.processRequestSchoolAdmin(days, SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
     @PostMapping("allow/request/teacher")

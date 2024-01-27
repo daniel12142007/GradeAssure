@@ -22,14 +22,16 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
             select
             new com.example.gradeassure.dto.response.TestForStudentResponse(
             test.id,
-            coalesce(case when request.dateDeadline < current date() then true else false end, false),
+            coalesce(case when request.dateDeadline > current_date then true else false end, false),
             test.name,
             test.dateCreated,
             count(request)
             )
             from TestTeacher test
-            join test.requestStudent request
-            where request.answered = true
+            left join test.requestStudents request
+             where request.answered = true
+                    and request.student.email = :email
+                    group by test.id, test.name, test.dateCreated, request.dateDeadline
             """)
     List<TestForStudentResponse> findAllTestResponseForStudent(
             @Param(value = "email") String email);

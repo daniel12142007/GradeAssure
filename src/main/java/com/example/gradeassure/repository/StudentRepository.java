@@ -19,13 +19,22 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     boolean existsByEmail(String email);
 
+//    @Query("""
+//            select
+//            new com.example.gradeassure.dto.response.RequestStudentForAllResponse(request.id,request.days,request.testName,t.email)
+//            from Student t
+//            left join t.requestStudents request
+//            on request.answered is null and request.dateAnswered is null
+//            where t.blocked = false
+//            """)
+//    List<RequestStudentForAllResponse> findAllRequestStudent();
     @Query("""
             select
             new com.example.gradeassure.dto.response.RequestStudentForAllResponse(request.id,request.days,request.testName,t.email)
             from Student t
-            left join t.requestStudents request
-            on request.answered = false and request.dateAnswered = null
-            where t.blocked = false
+            left join RequestStudent request
+            on request.student.email = t.email
+            where t.blocked = false and request.answered = false and request.dateAnswered is null
             """)
     List<RequestStudentForAllResponse> findAllRequestStudent();
 }

@@ -32,27 +32,15 @@ public class RequestSchoolAdminService {
     private final SchoolAdminRepository schoolAdminRepository;
     private final UserRepository userRepository;
 
-    public RequestSchoolAdminResponse processRequestSchoolAdmin(int days) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User currentUser = userRepository.findByEmail(currentUsername).orElse(null);
+    public RequestSchoolAdminResponse processRequestSchoolAdmin(int days, String email) {
+        User currentUser = userRepository.findByEmail(email).orElse(null);
 
         if (currentUser == null) {
             throw new AccessDeniedException("Текущий пользователь не найден");
         }
 
-        SchoolAdmin schoolAdmin = new SchoolAdmin();
-        schoolAdmin.setId(currentUser.getId());
-        schoolAdmin.setEmail(currentUser.getEmail());
-        schoolAdmin.setFullName(currentUser.getFullName());
-        schoolAdmin.setUser(currentUser);
-        schoolAdminRepository.save(schoolAdmin);
+        SchoolAdmin schoolAdmin = schoolAdminRepository.findByEmail(email).orElse(null);
 
-        if (schoolAdmin == null) {
-            throw new AccessDeniedException("Текущий пользователь не является администратором школы");
-        }
-
-        // Проверьте, отправлял ли администратор школы запрос ранее
         if (requestSchoolAdminRepository.countBySchoolAdminAndAnsweredFalse(schoolAdmin).orElse(0L) >= 2) {
             throw new IllegalStateException("Вы не можете отправить более двух запросов.");
         }
@@ -61,7 +49,6 @@ public class RequestSchoolAdminService {
         request.setDays(days);
         request.setDateCreated(LocalDateTime.now());
         request.setSchoolAdmin(schoolAdmin);
-
         requestSchoolAdminRepository.save(request);
 
         RequestSchoolAdminResponse response = new RequestSchoolAdminResponse();
@@ -69,7 +56,6 @@ public class RequestSchoolAdminService {
         response.setDays(request.getDays());
         response.setDateCreated(request.getDateCreated());
         response.setDateDeadline(request.getDateDeadline());
-
         return response;
     }
 
@@ -126,7 +112,7 @@ public class RequestSchoolAdminService {
         List<SchoolAdmin> unblockedSchoolAdmins = schoolAdminRepository.findAllUnblockedSchoolAdmins();
 
         return unblockedSchoolAdmins.stream()
-                .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName()))
+                .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getId(), schoolAdmin.getFullName(), schoolAdmin.getEmail()))
                 .collect(Collectors.toList());
     }
 
@@ -165,7 +151,7 @@ public class RequestSchoolAdminService {
         SchoolAdmin schoolAdmin = schoolAdminRepository.findById(schoolAdminId)
                 .orElseThrow(() -> new RuntimeException("Администратор школы не найден"));
 
-        return new SchoolAdminResponse(schoolAdmin.getFullName(), schoolAdmin.getEmail());
+        return new SchoolAdminResponse(schoolAdmin.getId(), schoolAdmin.getFullName(), schoolAdmin.getEmail());
     }
 
 
@@ -174,7 +160,7 @@ public class RequestSchoolAdminService {
 
         if (optionalSchoolAdmin.isPresent()) {
             SchoolAdmin schoolAdmin = optionalSchoolAdmin.get();
-            return new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName());
+            return new SchoolAdminResponse(schoolAdmin.getId(), schoolAdmin.getFullName(), schoolAdmin.getEmail());
         } else {
             return null;
         }
@@ -221,7 +207,7 @@ public class RequestSchoolAdminService {
         List<SchoolAdmin> blockedSchoolAdmins = schoolAdminRepository.findAllBlockedSchoolAdmins();
 
         return blockedSchoolAdmins.stream()
-                .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getEmail(), schoolAdmin.getFullName()))
+                .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getId(), schoolAdmin.getFullName(), schoolAdmin.getEmail()))
                 .collect(Collectors.toList());
     }
 
