@@ -33,13 +33,8 @@ public class AuthApi {
     @PostMapping("/login")
     @PermitAll
     public JWTResponse login(@RequestParam
-                             @Pattern(regexp = ".*@gmail.com$")
-                             @NotEmpty(message = "It is empty")
                              String email,
                              @RequestParam
-                             @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)[A-Za-z\\d]{8,}$", message = "The password does not meet the conditions")
-                             @Size(min = 8, message = "The line length must be at least 8 characters.")
-                             @NotEmpty(message = "It is empty")
                              String password) {
         return authService.login(email, password);
     }

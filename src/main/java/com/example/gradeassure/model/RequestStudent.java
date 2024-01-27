@@ -20,6 +20,7 @@ public class RequestStudent {
     @ManyToOne
     @JoinColumn(name = "student_id")
     private Student student;
-    @OneToOne(mappedBy = "requestStudent", cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @ManyToOne
+    @JoinColumn(name = "requestStudent_id")
     private TestTeacher teacher;
 }

@@ -35,9 +35,8 @@ public class TestTeacher {
     @JoinColumn(name = "check_id")
     private RequestTeacher check;
 
-    @OneToOne
-    @JoinColumn(name = "requestStudent_id")
-    private RequestStudent requestStudent;
+    @OneToMany(mappedBy = "teacher")
+    private List<RequestStudent> requestStudents;
 
     @OneToMany(mappedBy = "testTeacher", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TestStudent> testStudents;

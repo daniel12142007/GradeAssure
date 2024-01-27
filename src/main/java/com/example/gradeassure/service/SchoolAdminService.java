@@ -22,8 +22,9 @@ public class SchoolAdminService {
     private final UserRepository userRepository;
     private final StudentRepository studentRepository;
     private final RequestStudentRepository requestStudentRepository;
+    private final RequestStudentService requestStudentService;
 
-    public List<RequestStudentForAllResponse> refuseByIdAll(List<Long> studentId) {
+    public List<RequestStudentFindAllResponse> refuseByIdAll(List<Long> studentId) {
         List<RequestStudent> list = requestStudentRepository.findAllStudentsRequestById(studentId).stream().map(
                 requestStudent -> {
                     requestStudent.setDateAnswered(LocalDateTime.now());
@@ -33,19 +34,25 @@ public class SchoolAdminService {
                 }
         ).toList();
         requestStudentRepository.saveAll(list);
-        return studentRepository.findAllRequestStudent();
+        return requestStudentService.findAllRequestStudent();
     }
 
-    public List<RequestStudentForAllResponse> allowById(Long requestCreate) {
+    public List<RequestStudentFindAllResponse> allowById(Long requestCreate) {
         RequestStudent requestStudent = requestStudentRepository.findById(requestCreate).orElseThrow(RuntimeException::new);
         requestStudent.setDateAnswered(LocalDateTime.now());
         requestStudent.setDateDeadline(LocalDateTime.now().plusDays(requestStudent.getDays()));
         requestStudent.setAnswered(true);
+        Student student = requestStudent.getStudent();
+        if (requestStudentRepository.allowStudent(student.getEmail())) {
+            User user = student.getUser();
+            user.setRole(Role.STUDENT);
+            userRepository.save(user);
+        }
         requestStudentRepository.save(requestStudent);
-        return studentRepository.findAllRequestStudent();
+        return requestStudentService.findAllRequestStudent();
     }
 
-    public List<RequestStudentForAllResponse> blockStudent(List<Long> studentId) {
+    public List<RequestStudentFindAllResponse> blockStudent(List<Long> studentId) {
         List<RequestStudent> list = requestStudentRepository.findAllStudentsRequestById(studentId).stream().map(
                 requestStudent -> {
                     requestStudent.setDateAnswered(LocalDateTime.now());
@@ -64,6 +71,6 @@ public class SchoolAdminService {
                     return teacher;
                 }
         ).toList());
-        return studentRepository.findAllRequestStudent();
+        return requestStudentService.findAllRequestStudent();
     }
 }

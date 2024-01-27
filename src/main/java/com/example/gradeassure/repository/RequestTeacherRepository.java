@@ -32,4 +32,7 @@ public interface RequestTeacherRepository extends JpaRepository<RequestTeacher, 
 
     @Query("select r from RequestTeacher r where r.teacher.id = :id and r.action = 0 and r.dateAnswered = null")
     RequestTeacher findRequestCreate(@Param(value = "id") Long id);
+
+    @Query("select coalesce(case when count(r)=1 then true else false end,false ) from RequestTeacher r where r.teacher.email = :email")
+    boolean allowTeacher(@Param(value = "email") String email);
 }

@@ -19,7 +19,8 @@ public interface RequestSchoolAdminRepository extends JpaRepository<RequestSchoo
     Optional<RequestSchoolAdmin> findById(Long id);
 
     Optional<Long> countBySchoolAdminAndAnsweredFalse(SchoolAdmin schoolAdmin);
-@Query("select r from RequestSchoolAdmin r where r.dateDeadline = :currentDateTime")
+
+    @Query("select r from RequestSchoolAdmin r where r.dateDeadline = :currentDateTime")
     List<RequestSchoolAdmin> findBySchoolAdminBlockedFalseAndDateDeadlineBeforeAndAnsweredFalse(
             LocalDateTime currentDateTime
     );

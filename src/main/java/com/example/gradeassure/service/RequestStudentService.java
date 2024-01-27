@@ -11,9 +11,10 @@ import com.example.gradeassure.repository.TestTeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +24,12 @@ public class RequestStudentService {
     private final StudentRepository studentRepository;
     private final TestTeacherRepository teacherRepository;
     private final RequestStudentRepository requestStudentRepository;
+    private final EntityManager entityManager;
 
     public RequestStudentResponse studentRequest(String email, int day, String testName) {
         Student student = studentRepository.findByEmail(email).orElseThrow();
+        if (requestStudentRepository.check(student.getEmail()))
+            throw new RuntimeException("Вы должны пройти предудущий тест чтоб отправить ещё 1 запрос на прохождение теста");
         TestTeacher teacher = teacherRepository.findByName(testName);
         RequestStudent requestStudent = new RequestStudent();
         requestStudent.setDays(day);
@@ -54,9 +58,6 @@ public class RequestStudentService {
                     return response;
                 })
                 .collect(Collectors.toList());
-
         return responses;
     }
-
-    
 }
