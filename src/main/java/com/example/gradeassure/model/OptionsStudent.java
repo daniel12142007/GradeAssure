@@ -10,7 +10,8 @@ public class OptionsStudent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String variant;
+    private String option;
+    private String letter;
     private Boolean correct;
 
     @OneToOne

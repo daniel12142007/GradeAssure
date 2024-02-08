@@ -118,8 +118,8 @@ public class GradeAssureApplication {
         questionTeacherRepository.save(questionTeacher);
         questionTeacherRepository.save(questionTeacher1);
         questionTeacherRepository.save(questionTeacher2);
-        optionsTeacherRepository.save(optionsTeacher1);
         optionsTeacherRepository.save(optionsTeacher);
+        optionsTeacherRepository.save(optionsTeacher1);
 
         User user2 = User.builder()
                 .fullName("Admin School")

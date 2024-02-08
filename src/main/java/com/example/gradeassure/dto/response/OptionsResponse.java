@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class OptionsResponse {
     private Long id;
     private String variation;
+    private String letter;
     private boolean chose;
 }
