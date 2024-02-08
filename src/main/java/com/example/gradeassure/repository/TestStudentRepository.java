@@ -13,16 +13,19 @@ import java.util.List;
 @Transactional
 @Repository
 public interface TestStudentRepository extends JpaRepository<TestStudent, Long> {
-//    @Query("""
-//             select
-//            new com.example.gradeassure.dto.response.TakeTestStudentResponse(
-//            test.id,
-//            test.name
-//            )
-//            from TestStudent test
-//            where test.id = :testId
-//            """)
-//    List<TakeTestStudentResponse> findByTestId(@Param("testId") Long testId);
+    @Query("""
+            select
+            new com.example.gradeassure.dto.response.TakeTestStudentResponse(
+            test.id,
+            test.name
+            )
+            from TestStudent test
+            where test.name = :testName
+            and test.student.email = :email
+            and test.checked = false
+            """)
+    TakeTestStudentResponse findByTestId(@Param("testName") String testName,
+                                         @Param("email") String email);
 //private Long testId;
 //    private String name;
 //    private List<QuestionStudentResponse> questionStudentResponses;

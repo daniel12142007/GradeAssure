@@ -5,6 +5,7 @@ import com.example.gradeassure.model.*;
 import com.example.gradeassure.model.enums.AnswerFormat;
 import com.example.gradeassure.model.enums.Role;
 import com.example.gradeassure.repository.*;
+import com.example.gradeassure.service.SchoolAdminService;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.boot.SpringApplication;
@@ -25,8 +26,9 @@ public class GradeAssureApplication {
     private final SchoolAdminRepository adminRepository;
     private final QuestionTeacherRepository questionTeacherRepository;
     private final OptionsTeacherRepository optionsTeacherRepository;
-    private final AudioRepository audioRepository;
-    private final VideoRepository videoRepository;
+
+    private final SchoolAdminService schoolAdminService;
+    private final RequestStudentRepository requestStudentRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(GradeAssureApplication.class, args);
@@ -135,5 +137,16 @@ public class GradeAssureApplication {
 
         userRepository.save(user2);
         adminRepository.save(admin);
+
+        RequestStudent requestStudent = RequestStudent.builder()
+                .testName("Java 1 A")
+                .student(student)
+                .days(11)
+                .dateCreated(LocalDateTime.now())
+                .teacher(testTeacher)
+                .build();
+        requestStudentRepository.save(requestStudent);
+
+        schoolAdminService.allowById(1L);
     }
 }

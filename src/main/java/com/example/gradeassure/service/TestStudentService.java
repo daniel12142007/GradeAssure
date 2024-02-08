@@ -1,5 +1,6 @@
 package com.example.gradeassure.service;
 
+import com.example.gradeassure.dto.response.TakeTestStudentResponse;
 import com.example.gradeassure.dto.response.TestForStudentResponse;
 import com.example.gradeassure.repository.*;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -39,5 +40,9 @@ public class TestStudentService {
         LocalDate localDateDeadline = dateDeadline.toLocalDate();
         long daysDifference = ChronoUnit.DAYS.between(localDateAnswered, localDateDeadline);
         return Math.toIntExact(daysDifference);
+    }
+
+    public TakeTestStudentResponse takeTestStudent(String email, String testName) {
+        return testStudentRepository.findByTestId(testName, email);
     }
 }
