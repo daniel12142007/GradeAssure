@@ -1,5 +1,6 @@
 package com.example.gradeassure.repository;
 
+import com.example.gradeassure.dto.response.TakeTestStudentResponse;
 import com.example.gradeassure.dto.response.TestForStudentResponse;
 import com.example.gradeassure.model.TestTeacher;
 import org.springframework.data.jpa.repository.JpaRepository;

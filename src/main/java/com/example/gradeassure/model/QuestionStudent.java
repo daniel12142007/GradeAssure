@@ -19,13 +19,13 @@ public class QuestionStudent {
     @ManyToOne
     @JoinColumn(name = "testStudent_id")
     private TestStudent testStudent;
-
     @OneToOne(mappedBy = "answerVideo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Video video;
-
     @OneToOne(mappedBy = "answerAudio", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Audio audio;
-
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private OptionsStudent optionsStudent;
+    @ManyToOne
+    @JoinColumn(name = "question_teacher_id")
+    private QuestionTeacher questionTeacher;
 }
