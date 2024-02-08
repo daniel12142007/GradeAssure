@@ -4,9 +4,9 @@ import com.example.gradeassure.dto.response.OptionsResponse;
 import com.example.gradeassure.dto.response.QuestionStudentResponse;
 import com.example.gradeassure.dto.response.TakeTestStudentResponse;
 import com.example.gradeassure.dto.response.TestForStudentResponse;
+import com.example.gradeassure.model.*;
 import com.example.gradeassure.model.enums.AnswerFormat;
 import com.example.gradeassure.repository.*;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,8 +24,8 @@ public class TestStudentService {
     private final TestStudentRepository testStudentRepository;
     private final QuestionStudentRepository questionStudentRepository;
     private final OptionsStudentRepository optionsStudentRepository;
-    private final StudentRepository studentRepository;
     private final TestTeacherRepository testTeacherRepository;
+    private final OptionsTeacherRepository optionsTeacherRepository;
     private final EntityManager entityManager;
     private final AudioRepository audioRepository;
     private final VideoRepository videoRepository;
@@ -77,5 +76,50 @@ public class TestStudentService {
         }
         test.setQuestionStudentResponses(list);
         return test;
+    }
+
+    public TakeTestStudentResponse passingOption(String email, String testName, Long optionId, Long questionId) {
+        QuestionStudent questionStudent = questionStudentRepository.findById(questionId).orElse(null);
+        if (questionStudent == null)
+            throw new RuntimeException("not found question student");
+        check(questionStudent);
+        OptionsTeacher optionsTeacher = optionsTeacherRepository.findById(optionId).orElseThrow(RuntimeException::new);
+        OptionsStudent optionsStudent = OptionsStudent.builder()
+                .option(optionsTeacher.getOption())
+                .correct(optionsTeacher.getCorrect())
+                .letter(optionsTeacher.getLetter())
+                .student(questionStudent)
+                .build();
+        optionsStudentRepository.save(optionsStudent);
+        return takeTestStudent(email, testName);
+    }
+
+    public TakeTestStudentResponse passingVideo(String email, String testName, String video, Long questionId) {
+        QuestionStudent questionStudent = questionStudentRepository.findById(questionId).orElse(null);
+        if (questionStudent == null)
+            throw new RuntimeException("not found question student");
+        check(questionStudent);
+        Video video1 = new Video();
+        video1.setVideo(video);
+        video1.setAnswerVideo(questionStudent);
+        videoRepository.save(video1);
+        return takeTestStudent(email, testName);
+    }
+
+    public TakeTestStudentResponse passingAudio(String email, String testName, String audio, Long questionId) {
+        QuestionStudent questionStudent = questionStudentRepository.findById(questionId).orElse(null);
+        if (questionStudent == null)
+            throw new RuntimeException("not found question student");
+        check(questionStudent);
+        Audio audio1 = new Audio();
+        audio1.setAudio(audio);
+        audio1.setAnswerAudio(questionStudent);
+        audioRepository.save(audio1);
+        return takeTestStudent(email, testName);
+    }
+
+    private void check(QuestionStudent questionStudent) {
+        if (questionStudent.getOptionsStudent() != null && questionStudent.getVideo() != null && questionStudent.getAudio() != null)
+            throw new RuntimeException("You already answer");
     }
 }

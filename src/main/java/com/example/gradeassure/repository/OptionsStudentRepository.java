@@ -28,7 +28,8 @@ public interface OptionsStudentRepository extends JpaRepository<OptionsStudent, 
             left join teacher.optionsTeachers option
             where question.id = :questionId and not option.letter = :letter
             """)
-    List<OptionsResponse> findByAllOptions(@Param(value = "questionId") Long questionId, @Param(value = "letter") String letter);
+    List<OptionsResponse> findByAllOptions(@Param(value = "questionId") Long questionId,
+                                           @Param(value = "letter") String letter);
 
     @Query("""
             select
