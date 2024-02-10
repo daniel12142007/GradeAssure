@@ -35,6 +35,6 @@ public class RequestTeacher {
     @OneToOne(mappedBy = "create", cascade = CascadeType.ALL)
     private TestTeacher testTeacher;
 
-    @OneToMany(mappedBy = "check", cascade = CascadeType.REFRESH)
+    @ManyToMany(mappedBy = "check", cascade = CascadeType.ALL)
     private List<TestTeacher> testTeachers;
 }

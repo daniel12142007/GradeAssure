@@ -31,7 +31,7 @@ public class TakeTestStudent {
         return testStudentService.passingOption(email, testName, optionId, questionId);
     }
 
-    @PostMapping("passing/option")
+    @PostMapping("passing/video")
     @PreAuthorize("hasAnyAuthority('STUDENT')")
     public TakeTestStudentResponse passingVideo(@RequestParam String email,
                                                 @RequestParam String testName,
@@ -40,7 +40,7 @@ public class TakeTestStudent {
         return testStudentService.passingVideo(email, testName, video, questionId);
     }
 
-    @PostMapping("passing/option")
+    @PostMapping("passing/audio")
     @PreAuthorize("hasAnyAuthority('STUDENT')")
     public TakeTestStudentResponse passingAudio(@RequestParam String email,
                                                 @RequestParam String testName,

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.FilterJoinTable;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,9 +32,11 @@ public class TestTeacher {
     @JoinColumn(name = "create_id")
     private RequestTeacher create;
 
-    @ManyToOne
-    @JoinColumn(name = "check_id")
-    private RequestTeacher check;
+    @ManyToMany
+    @JoinTable(name = "testTeacher_requestTeacher",
+            joinColumns = @JoinColumn(name = "test_teacher_id"),
+            inverseJoinColumns = @JoinColumn(name = "request_teacher_id"))
+    private List<RequestTeacher> check;
 
     @OneToMany(mappedBy = "teacher")
     private List<RequestStudent> requestStudents;

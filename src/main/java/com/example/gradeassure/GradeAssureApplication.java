@@ -26,7 +26,6 @@ public class GradeAssureApplication {
     private final SchoolAdminRepository adminRepository;
     private final QuestionTeacherRepository questionTeacherRepository;
     private final OptionsTeacherRepository optionsTeacherRepository;
-
     private final SchoolAdminService schoolAdminService;
     private final RequestStudentRepository requestStudentRepository;
 
