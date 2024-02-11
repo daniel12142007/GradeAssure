@@ -56,7 +56,3 @@ public interface RequestTeacherRepository extends JpaRepository<RequestTeacher, 
     @Query("select test.name from RequestTeacher request join request.testTeachers test where request.id = :requestId")
     List<String> findAllTestName(@Param(value = "requestId") Long requestId);
 }
-// private Long id;
-//    private String email;
-//    private String fullName;
-//    private Action action = Action.CHECK;

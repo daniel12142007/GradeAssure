@@ -34,4 +34,21 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
             """)
     List<TestForStudentResponse> findAllTestResponseForStudent(
             @Param(value = "email") String email);
+
+    @Query("""
+            select
+            new com.example.gradeassure.dto.response.TestForStudentResponse(
+            test.id,
+            coalesce(case when request.dateDeadline > current_date then true else false end, false),
+            test.name,
+            test.dateCreated,
+            (select count(i) from TestTeacher testTeacher
+            join testTeacher.requestStudents i where testTeacher.id = test.id)
+            )
+            from TestTeacher test
+            left join test.check request
+            on request.answered = true and request.teacher.email = :email
+            """)
+    List<TestForStudentResponse> findAllTestResponseForTeacher(
+            @Param(value = "email") String email);
 }

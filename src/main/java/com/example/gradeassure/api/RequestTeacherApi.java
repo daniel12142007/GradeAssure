@@ -3,7 +3,10 @@ package com.example.gradeassure.api;
 import com.example.gradeassure.dto.response.RequestTeacherFindByResponse;
 import com.example.gradeassure.dto.response.RequestTeacherResponse;
 import com.example.gradeassure.service.RequestTeacherService;
+import io.swagger.v3.oas.annotations.OpenAPI30;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +18,6 @@ public class RequestTeacherApi {
     private final RequestTeacherService requestTeacherService;
 
     @PostMapping("send/request/create")
-//    @PreAuthorize("hasAnyAuthority('TEACHER')")
     public RequestTeacherResponse sendRequestCreate(@RequestParam String subject,
                                                     @RequestParam int days,
                                                     @RequestParam String email) {
@@ -23,7 +25,6 @@ public class RequestTeacherApi {
     }
 
     @PostMapping("send/request/check")
-//    @PreAuthorize("hasAnyAuthority('TEACHER')")
     public RequestTeacherResponse sendCheck(@RequestParam List<Long> testId,
                                             @RequestParam int days,
                                             @RequestParam String email) {
@@ -31,7 +32,8 @@ public class RequestTeacherApi {
     }
 
     @GetMapping("find/by/id/request/check")
-//    @PreAuthorize("hasAnyAuthority('TEACHER')")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
+    @Operation(summary = "Checking(Teacher) figma page", description = "method for admin school")
     public RequestTeacherFindByResponse findByIdRequestTeacherFindByResponse(@RequestParam Long id) {
         return requestTeacherService.findByIdCheck(id);
     }
