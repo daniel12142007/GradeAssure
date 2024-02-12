@@ -35,6 +35,6 @@ public class RequestTeacher {
     @OneToOne(mappedBy = "create", cascade = CascadeType.ALL)
     private TestTeacher testTeacher;
 
-    @ManyToMany(mappedBy = "check", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "check")
     private List<TestTeacher> testTeachers;
 }

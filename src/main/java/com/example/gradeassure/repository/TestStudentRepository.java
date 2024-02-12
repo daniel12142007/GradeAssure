@@ -1,5 +1,6 @@
 package com.example.gradeassure.repository;
 
+import com.example.gradeassure.dto.response.ResultResponse;
 import com.example.gradeassure.dto.response.TakeTestStudentResponse;
 import com.example.gradeassure.model.TestStudent;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,18 +27,34 @@ public interface TestStudentRepository extends JpaRepository<TestStudent, Long> 
             """)
     TakeTestStudentResponse findByTestId(@Param("testName") String testName,
                                          @Param("email") String email);
-//private Long testId;
-//    private String name;
-//    private List<QuestionStudentResponse> questionStudentResponses;
 
-// private Long id;
-//    private String question;
-//    private String video;
-//    private String audio;
-//    private AnswerFormat answerFormat;
-//    private List<OptionsResponse> option;
-
-//    private Long id;
-//    private String variation;
-//    private boolean chose;
+    @Query("""
+            select
+            new com.example.gradeassure.dto.response.ResultResponse(
+                    test.id,
+                    test.student.fullName,
+                    test.dateCreated,
+                    (select sum(quest.points)
+                     from TestTeacher testTeacher
+                     join testTeacher.questionTeachers quest
+                     where testTeacher.id = test.id),
+                     coalesce(case when test.status = 'UNDEFINED' then false else true end,true)
+                     ,
+                    test.status,
+                    (select
+                     sum(question.points)
+                     from TestStudent testStudent
+                     join testStudent.questionStudents question
+                     where testStudent.id = test.id)
+                    )
+                    from TestStudent test
+                    join test.questionStudents questsion
+                    where
+                    test.name = :testName
+                    and questsion.audio is not null
+                    or questsion.video is not null
+                    or questsion.optionsStudent is not null
+                    group by test.id, test.student.fullName, test.dateCreated, test.status
+                    """)
+    List<ResultResponse> findAllResultTest(@Param("testName") String testName);
 }

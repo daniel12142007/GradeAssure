@@ -1,9 +1,6 @@
 package com.example.gradeassure.service;
 
-import com.example.gradeassure.dto.response.OptionsResponse;
-import com.example.gradeassure.dto.response.QuestionStudentResponse;
-import com.example.gradeassure.dto.response.TakeTestStudentResponse;
-import com.example.gradeassure.dto.response.TestForStudentResponse;
+import com.example.gradeassure.dto.response.*;
 import com.example.gradeassure.model.*;
 import com.example.gradeassure.model.enums.AnswerFormat;
 import com.example.gradeassure.repository.*;
@@ -23,6 +20,7 @@ import java.util.List;
 public class TestStudentService {
     private final TestStudentRepository testStudentRepository;
     private final QuestionStudentRepository questionStudentRepository;
+    private final QuestionTeacherRepository questionTeacherRepository;
     private final OptionsStudentRepository optionsStudentRepository;
     private final TestTeacherRepository testTeacherRepository;
     private final OptionsTeacherRepository optionsTeacherRepository;
@@ -78,7 +76,10 @@ public class TestStudentService {
         return test;
     }
 
-    public TakeTestStudentResponse passingOption(String email, String testName, Long optionId, Long questionId) {
+    public TakeTestStudentResponse passingOption(String email,
+                                                 String testName,
+                                                 Long optionId,
+                                                 Long questionId) {
         QuestionStudent questionStudent = questionStudentRepository.findById(questionId).orElse(null);
         if (questionStudent == null)
             throw new RuntimeException("not found question student");
@@ -90,7 +91,10 @@ public class TestStudentService {
                 .letter(optionsTeacher.getLetter())
                 .student(questionStudent)
                 .build();
+        questionStudent.setPoints(optionsTeacher.getCorrect() ?
+                questionTeacherRepository.findByIdQuestionTeacher(questionStudent.getId()) : 0);
         optionsStudentRepository.save(optionsStudent);
+        questionStudentRepository.save(questionStudent);
         return takeTestStudent(email, testName);
     }
 
@@ -121,5 +125,11 @@ public class TestStudentService {
     private void check(QuestionStudent questionStudent) {
         if (questionStudent.getOptionsStudent() != null && questionStudent.getVideo() != null && questionStudent.getAudio() != null)
             throw new RuntimeException("You already answer");
+    }
+
+    public List<ResultResponse> findAllResultTest(String testName, String email) {
+        if (!testTeacherRepository.checkTeacher(email))
+            throw new RuntimeException("You do not have access to this test");
+        return testStudentRepository.findAllResultTest(testName);
     }
 }

@@ -45,4 +45,7 @@ public interface QuestionTeacherRepository extends JpaRepository<QuestionTeacher
             order by question.id
             """)
     List<QuestionTeacher> findAllQuestionTeacher(@Param(value = "id") Long id);
+
+    @Query("select question.points from QuestionStudent quesitonStudent join quesitonStudent.questionTeacher question where quesitonStudent.id = :id")
+    int findByIdQuestionTeacher(@Param(value = "id") Long id);
 }

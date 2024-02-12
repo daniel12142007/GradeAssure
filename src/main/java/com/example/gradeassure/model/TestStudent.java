@@ -1,6 +1,7 @@
 package com.example.gradeassure.model;
 
 
+import com.example.gradeassure.model.enums.TestStatus;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,6 +19,8 @@ public class TestStudent {
     private LocalDateTime dateCreated;
     private boolean passed;
     private boolean checked;
+    @Enumerated(EnumType.STRING)
+    private TestStatus status = TestStatus.UNDEFINED;
 
     @ManyToOne
     @JoinColumn(name = "student_id")

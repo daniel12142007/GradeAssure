@@ -1,22 +1,26 @@
 package com.example.gradeassure;
 
-import com.example.gradeassure.dto.request.OptionsTeacherRequest;
+import com.example.gradeassure.api.RequestTeacherApi;
 import com.example.gradeassure.model.*;
 import com.example.gradeassure.model.enums.AnswerFormat;
 import com.example.gradeassure.model.enums.Role;
 import com.example.gradeassure.repository.*;
+import com.example.gradeassure.service.RequestTeacherService;
 import com.example.gradeassure.service.SchoolAdminService;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 @RequiredArgsConstructor
+@Transactional
 public class GradeAssureApplication {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,6 +32,8 @@ public class GradeAssureApplication {
     private final OptionsTeacherRepository optionsTeacherRepository;
     private final SchoolAdminService schoolAdminService;
     private final RequestStudentRepository requestStudentRepository;
+    private final RequestTeacherService requestTeacherService;
+    private final RequestTeacherApi requestTeacherApi;
 
     public static void main(String[] args) {
         SpringApplication.run(GradeAssureApplication.class, args);
@@ -145,7 +151,6 @@ public class GradeAssureApplication {
                 .teacher(testTeacher)
                 .build();
         requestStudentRepository.save(requestStudent);
-
         schoolAdminService.allowById(1L);
     }
 }

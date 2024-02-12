@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class SchoolAdminService {
     private final UserRepository userRepository;
     private final StudentRepository studentRepository;
@@ -60,7 +62,6 @@ public class SchoolAdminService {
         questionTeacherRepository.findAllQuestionTeacher(testTeacher.getId()).forEach(a -> {
             QuestionStudent questionStudent = new QuestionStudent();
             questionStudent.setQuestion(a.getQuestion());
-            questionStudent.setPoints(a.getPoints());
             questionStudent.setTestStudent(testStudent);
             questionStudent.setQuestionTeacher(a);
             questionStudent.setAnswerFormat(a.getAnswerFormat());

@@ -3,7 +3,6 @@ package com.example.gradeassure.api;
 import com.example.gradeassure.dto.response.RequestTeacherFindByResponse;
 import com.example.gradeassure.dto.response.RequestTeacherResponse;
 import com.example.gradeassure.service.RequestTeacherService;
-import io.swagger.v3.oas.annotations.OpenAPI30;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

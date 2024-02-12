@@ -51,4 +51,13 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
             """)
     List<TestForStudentResponse> findAllTestResponseForTeacher(
             @Param(value = "email") String email);
+
+    @Query("""
+            select
+            coalesce(case when request.dateDeadline > current_date then true else false end, false)
+            from TestTeacher test
+            left join test.check request
+            on request.answered = true and request.teacher.email = :email
+            """)
+    boolean checkTeacher(@Param("email") String email);
 }

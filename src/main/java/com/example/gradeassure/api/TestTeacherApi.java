@@ -3,8 +3,10 @@ package com.example.gradeassure.api;
 import com.example.gradeassure.dto.request.OptionsTeacherRequest;
 import com.example.gradeassure.dto.request.QuestionTeacherRequest;
 import com.example.gradeassure.dto.response.QuestionTeacherResponse;
+import com.example.gradeassure.dto.response.ResultResponse;
 import com.example.gradeassure.dto.response.TestForStudentResponse;
 import com.example.gradeassure.dto.response.TestTeacherResponse;
+import com.example.gradeassure.service.TestStudentService;
 import com.example.gradeassure.service.TestTeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +22,7 @@ import java.util.List;
 //@PreAuthorize("hasAnyAuthority('TEACHER')")
 public class TestTeacherApi {
     private final TestTeacherService teacherService;
+    private final TestStudentService testStudentService;
 
     @GetMapping("find/all/test/for/teacher")
     public List<TestForStudentResponse> findAllTest(@RequestParam String email) {
@@ -62,5 +65,13 @@ public class TestTeacherApi {
     public TestTeacherResponse minScores(@RequestParam("testId") Long testId,
                                          @RequestParam("scores") int scores) {
         return teacherService.minScores(testId, scores);
+    }
+
+    @GetMapping("find/result")
+    public List<ResultResponse> findResult(
+            @RequestParam String testName,
+            @RequestParam String email
+    ) {
+        return testStudentService.findAllResultTest(testName, email);
     }
 }
