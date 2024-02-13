@@ -71,9 +71,4 @@ public class TestTeacherApi {
     ) {
         return testStudentService.findAllResultTest(testName, email);
     }
-
-    @GetMapping("find/by/id/student/test/check")
-    public CheckTestStudentResponse check(@RequestParam Long testId) {
-        return testStudentService.findByIdTestStudentCheck(testId);
-    }
 }

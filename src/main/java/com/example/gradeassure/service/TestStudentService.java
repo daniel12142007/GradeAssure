@@ -133,7 +133,9 @@ public class TestStudentService {
         return testStudentRepository.findAllResultTest(testName);
     }
 
-    public CheckTestStudentResponse findByIdTestStudentCheck(Long testId) {
+    public CheckTestStudentResponse findByIdTestStudentCheck(Long testId, String email) {
+        if (!testTeacherRepository.checkTeacher(email))
+            throw new RuntimeException("You do not have access to this test");
         CheckTestStudentResponse testStudentResponse = testTeacherRepository.findByIdCheckTestStudent(testId);
         List<CheckQuestionTeacherResponse> list = testTeacherRepository.findByIdCheckQuestionTeacher(testId);
         list.forEach(

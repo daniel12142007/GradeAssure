@@ -78,6 +78,7 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
                          questionStudent.id,
                          questionTeacher.question,
                          questionStudent.points,
+                         questionTeacher.points,
                          questionTeacher.answerFormat
             )
             from TestStudent testStudent

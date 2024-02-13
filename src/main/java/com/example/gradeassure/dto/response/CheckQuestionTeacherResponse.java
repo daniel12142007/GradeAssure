@@ -15,13 +15,15 @@ public class CheckQuestionTeacherResponse {
     private List<CheckOptionResponse> options;
     private String video;
     private String audio;
+    private int maxPoint;
     private int point;
     private AnswerFormat answerFormat;
 
-    public CheckQuestionTeacherResponse(Long id, String question, int point, AnswerFormat answerFormat) {
+    public CheckQuestionTeacherResponse(Long id, String question, int point, int maxPoint, AnswerFormat answerFormat) {
         this.id = id;
         this.question = question;
         this.point = point;
         this.answerFormat = answerFormat;
+        this.maxPoint = maxPoint;
     }
 }

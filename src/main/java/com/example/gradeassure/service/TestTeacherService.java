@@ -2,12 +2,15 @@ package com.example.gradeassure.service;
 
 import com.example.gradeassure.dto.request.OptionsTeacherRequest;
 import com.example.gradeassure.dto.request.QuestionTeacherRequest;
+import com.example.gradeassure.dto.response.CheckTestStudentResponse;
 import com.example.gradeassure.dto.response.QuestionTeacherResponse;
 import com.example.gradeassure.dto.response.TestForStudentResponse;
 import com.example.gradeassure.dto.response.TestTeacherResponse;
 import com.example.gradeassure.model.*;
+import com.example.gradeassure.model.enums.AnswerFormat;
 import com.example.gradeassure.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +24,9 @@ public class TestTeacherService {
     private final UserRepository userRepository;
     private final OptionsTeacherRepository optionsTeacherRepository;
     private final QuestionTeacherRepository questionTeacherRepository;
+    private final QuestionStudentRepository questionStudentRepository;
     private final RequestTeacherRepository requestTeacherRepository;
+    private final TestStudentService testStudentService;
 
     public TestTeacherResponse createTestTeacher(String email, String testName) {
         Teacher teacher = teacherRepository.findByEmail(email).orElseThrow(RuntimeException::new);
@@ -122,5 +127,29 @@ public class TestTeacherService {
     //    TODO: check test
     public List<TestForStudentResponse> findAllTestForTeacher(String email) {
         return testTeacherRepository.findAllTestResponseForTeacher(email);
+    }
+
+    public CheckTestStudentResponse checkVideo(Long testId, String email, int point, Long questionId) {
+        QuestionStudent questionStudent = questionStudentRepository.findById(questionId).orElseThrow();
+        QuestionTeacher questionTeacher = questionStudent.getQuestionTeacher();
+        if (point > questionTeacher.getPoints())
+            throw new RuntimeException("Вы дали слишком много баллов максимум:" + questionTeacher.getPoints());
+        if (questionStudent.getAnswerFormat() != AnswerFormat.VIDEO)
+            throw new RuntimeException("У этого вопроса формат должно быть видио");
+        questionStudent.setPoints(point);
+        questionStudentRepository.save(questionStudent);
+        return testStudentService.findByIdTestStudentCheck(testId, email);
+    }
+
+    public CheckTestStudentResponse checkAudio(Long testId, String email, int point, Long questionId) {
+        QuestionStudent questionStudent = questionStudentRepository.findById(questionId).orElseThrow();
+        QuestionTeacher questionTeacher = questionStudent.getQuestionTeacher();
+        if (point > questionTeacher.getPoints())
+            throw new RuntimeException("Вы дали слишком много баллов максимум:" + questionTeacher.getPoints());
+        if (questionStudent.getAnswerFormat() != AnswerFormat.AUDIO)
+            throw new RuntimeException("У этого вопроса формат должно быть аудио");
+        questionStudent.setPoints(point);
+        questionStudentRepository.save(questionStudent);
+        return testStudentService.findByIdTestStudentCheck(testId, email);
     }
 }
