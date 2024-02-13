@@ -135,9 +135,7 @@ public class TestStudentService {
 
     public CheckTestStudentResponse findByIdTestStudentCheck(Long testId) {
         CheckTestStudentResponse testStudentResponse = testTeacherRepository.findByIdCheckTestStudent(testId);
-        System.out.println(testStudentResponse);
         List<CheckQuestionTeacherResponse> list = testTeacherRepository.findByIdCheckQuestionTeacher(testId);
-        System.out.println(list);
         list.forEach(
                 a -> {
                     if (a.getAnswerFormat() == AnswerFormat.OPTION)

@@ -88,6 +88,7 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
             """)
     List<CheckQuestionTeacherResponse> findByIdCheckQuestionTeacher(@Param(value = "testId") Long testId);
 
+
     @Query("""
             select
             new com.example.gradeassure.dto.response.CheckOptionResponse(
@@ -112,102 +113,3 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
     @Query("select audio.audio from Audio audio where audio.answerAudio.id = :questionId")
     String audio(@Param(value = "questionId") Long questionId);
 }
-
-//@Query("""
-//            select
-//            new com.example.gradeassure.dto.response.CheckTestStudentResponse(
-//            testStudent.id,
-//            (select
-//            new com.example.gradeassure.dto.response.CheckQuestionTeacherResponse(
-//             questionTeacher.id,
-//             questionTeacher.question,
-//
-//             coalesce(
-//              (select
-//              new com.example.gradeassure.dto.response.CheckOptionResponse(
-//               optionTeacher.id,
-//               optionTeacher.option,
-//               optionTeacher.letter,
-//               optionTeacher.correct
-//              )
-//              from questionTeacher.optionsTeachers optionTeacher
-//              join questionStudent.optionsStudent optionStudent
-//              where questionTeacher.id = questionStudent.questionTeacher.id
-//              and questionTeacher.answerFormat = 'OPTION'
-//             ),
-//             null
-//             ),
-//
-//             coalesce(
-//              (select video from questionStudent.video.video video
-//              where questionTeacher.id = questionStudent.questionTeacher.id
-//              and questionTeacher.answerFormat = 'VIDEO'
-//              ),
-//             null
-//             ),
-//
-//             coalesce(
-//              (select audio from questionStudent.audio.audio audio
-//              where questionTeacher.id = questionStudent.questionTeacher.id
-//              and questionTeacher.answerFormat = 'AUDIO'
-//              ),
-//             null
-//             )
-//
-//             )
-//             from testTeacher.questionTeachers questionTeacher
-//             join testStudent.questionStudents questionStudent
-//             )
-//
-//            )
-//            from TestTeacher testTeacher
-//            join testTeacher.testStudents testStudent
-//            where testStudent.id = :testId
-//            """)
-//    CheckTestStudentResponse findByIdCheckTestStudent(@Param(value = "testId") Long testId);
-
-
-//@Query("""
-//            select
-//            new com.example.gradeassure.dto.response.CheckTestStudentResponse(
-//            testStudent.id,
-//             (select
-//             new com.example.gradeassure.dto.response.CheckQuestionTeacherResponse(
-//             questionTeacher.id,
-//             questionTeacher.question,
-//             coalesce(
-//              case when questionTeacher.id = questionStudent.questionTeacher.id
-//              and questionTeacher.answerFormat = 'OPTION' then
-//               (select
-//               new com.example.gradeassure.dto.response.CheckOptionResponse(
-//               optionTeacher.id,
-//               optionTeacher.option,
-//               optionTeacher.letter,
-//               optionTeacher.correct,
-//               coalesce(case when optionStudent.letter = optionTeacher.letter then true else false end,false )
-//               )
-//               from questionTeacher.optionsTeachers optionTeacher
-//               join questionStudent.optionsStudent optionStudent
-//               ) end, null
-//              ),
-//              coalesce(
-//               case when questionStudent.id = questionStudent.questionTeacher.id
-//               and questionTeacher.answerFormat = 'VIDEO' then
-//               (select video from questionStudent.video.video video)
-//               end ,null
-//              ),
-//              coalesce(
-//               case when questionStudent.id = questionStudent.questionTeacher.id
-//               and questionTeacher.answerFormat = 'AUDIO' then
-//               (select audio from questionStudent.audio.audio audio)
-//               end, null
-//              )
-//             )
-//             from testTeacher.questionTeachers questionTeacher
-//             join testStudent.questionStudents questionStudent
-//             )
-//            )
-//            from TestTeacher testTeacher
-//            join testTeacher.testStudents testStudent
-//            where testStudent.id = :testId
-//            """)
