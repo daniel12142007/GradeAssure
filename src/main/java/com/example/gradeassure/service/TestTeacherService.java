@@ -2,12 +2,10 @@ package com.example.gradeassure.service;
 
 import com.example.gradeassure.dto.request.OptionsTeacherRequest;
 import com.example.gradeassure.dto.request.QuestionTeacherRequest;
-import com.example.gradeassure.dto.response.CheckTestStudentResponse;
-import com.example.gradeassure.dto.response.QuestionTeacherResponse;
-import com.example.gradeassure.dto.response.TestForStudentResponse;
-import com.example.gradeassure.dto.response.TestTeacherResponse;
+import com.example.gradeassure.dto.response.*;
 import com.example.gradeassure.model.*;
 import com.example.gradeassure.model.enums.AnswerFormat;
+import com.example.gradeassure.model.enums.TestStatus;
 import com.example.gradeassure.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.patterns.TypePatternQuestions;
@@ -21,12 +19,12 @@ import java.util.List;
 public class TestTeacherService {
     private final TestTeacherRepository testTeacherRepository;
     private final TeacherRepository teacherRepository;
-    private final UserRepository userRepository;
-    private final OptionsTeacherRepository optionsTeacherRepository;
+    private final TestStudentService testStudentService;
+    private final TestStudentRepository testStudentRepository;
     private final QuestionTeacherRepository questionTeacherRepository;
     private final QuestionStudentRepository questionStudentRepository;
     private final RequestTeacherRepository requestTeacherRepository;
-    private final TestStudentService testStudentService;
+    private final OptionsTeacherRepository optionsTeacherRepository;
 
     public TestTeacherResponse createTestTeacher(String email, String testName) {
         Teacher teacher = teacherRepository.findByEmail(email).orElseThrow(RuntimeException::new);
@@ -132,10 +130,13 @@ public class TestTeacherService {
     public CheckTestStudentResponse checkVideo(Long testId, String email, int point, Long questionId) {
         QuestionStudent questionStudent = questionStudentRepository.findById(questionId).orElseThrow();
         QuestionTeacher questionTeacher = questionStudent.getQuestionTeacher();
+        if (!testTeacherRepository.checkTeacher(email))
+            throw new RuntimeException("You do not have access to this test");
         if (point > questionTeacher.getPoints())
             throw new RuntimeException("Вы дали слишком много баллов максимум:" + questionTeacher.getPoints());
         if (questionStudent.getAnswerFormat() != AnswerFormat.VIDEO)
             throw new RuntimeException("У этого вопроса формат должно быть видио");
+        questionStudent.setChecked(true);
         questionStudent.setPoints(point);
         questionStudentRepository.save(questionStudent);
         return testStudentService.findByIdTestStudentCheck(testId, email);
@@ -144,12 +145,30 @@ public class TestTeacherService {
     public CheckTestStudentResponse checkAudio(Long testId, String email, int point, Long questionId) {
         QuestionStudent questionStudent = questionStudentRepository.findById(questionId).orElseThrow();
         QuestionTeacher questionTeacher = questionStudent.getQuestionTeacher();
+        if (!testTeacherRepository.checkTeacher(email))
+            throw new RuntimeException("You do not have access to this test");
         if (point > questionTeacher.getPoints())
             throw new RuntimeException("Вы дали слишком много баллов максимум:" + questionTeacher.getPoints());
         if (questionStudent.getAnswerFormat() != AnswerFormat.AUDIO)
             throw new RuntimeException("У этого вопроса формат должно быть аудио");
+        questionStudent.setChecked(true);
         questionStudent.setPoints(point);
         questionStudentRepository.save(questionStudent);
         return testStudentService.findByIdTestStudentCheck(testId, email);
+    }
+
+    public List<ResultResponse> finishCheck(Long testId, String email) {
+        TestStudent testStudent = testStudentRepository.findById(testId).orElseThrow();
+        TestTeacher testTeacher = testStudent.getTestTeacher();
+        if (!testTeacherRepository.checkTeacher(email))
+            throw new RuntimeException("You do not have access to this test");
+        if (testStudentRepository.sumPoint(testId) >= testTeacher.getMinScores())
+            testStudent.setStatus(TestStatus.YES);
+        if (testStudentRepository.sumPoint(testId) < testTeacher.getMinScores())
+            testStudent.setStatus(TestStatus.NO);
+        if (testStudentRepository.checkQuestion(testStudent.getId()) > 0)
+            throw new RuntimeException("Вы проверили не все ответы");
+        testStudentRepository.save(testStudent);
+        return testStudentService.findAllResultTest(testStudent.getName(), email);
     }
 }

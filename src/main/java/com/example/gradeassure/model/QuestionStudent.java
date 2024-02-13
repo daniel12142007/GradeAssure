@@ -15,7 +15,7 @@ public class QuestionStudent {
     private AnswerFormat answerFormat;
     private int optionsMax;
     private int points;
-
+    private boolean checked;
     @ManyToOne
     @JoinColumn(name = "testStudent_id")
     private TestStudent testStudent;

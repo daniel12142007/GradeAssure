@@ -93,6 +93,7 @@ public class TestStudentService {
                 .build();
         questionStudent.setPoints(optionsTeacher.getCorrect() ?
                 questionTeacherRepository.findByIdQuestionTeacher(questionStudent.getId()) : 0);
+        questionStudent.setChecked(true);
         optionsStudentRepository.save(optionsStudent);
         questionStudentRepository.save(questionStudent);
         return takeTestStudent(email, testName);
