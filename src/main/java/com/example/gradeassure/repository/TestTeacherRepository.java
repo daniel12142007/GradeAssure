@@ -1,7 +1,6 @@
 package com.example.gradeassure.repository;
 
-import com.example.gradeassure.dto.response.TakeTestStudentResponse;
-import com.example.gradeassure.dto.response.TestForStudentResponse;
+import com.example.gradeassure.dto.response.*;
 import com.example.gradeassure.model.TestTeacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -60,4 +59,155 @@ public interface TestTeacherRepository extends JpaRepository<TestTeacher, Long> 
             on request.answered = true and request.teacher.email = :email
             """)
     boolean checkTeacher(@Param("email") String email);
+
+    @Query("""
+            select
+            new com.example.gradeassure.dto.response.CheckTestStudentResponse(
+            testStudent.id
+            )
+            from TestTeacher testTeacher
+            join testTeacher.testStudents testStudent
+            where testStudent.id = :testId
+            order by testStudent.id
+            """)
+    CheckTestStudentResponse findByIdCheckTestStudent(@Param(value = "testId") Long testId);
+
+    @Query("""
+            select
+            new com.example.gradeassure.dto.response.CheckQuestionTeacherResponse(
+                         questionStudent.id,
+                         questionTeacher.question,
+                         questionStudent.points,
+                         questionTeacher.answerFormat
+            )
+            from TestStudent testStudent
+            join testStudent.questionStudents questionStudent
+            join questionStudent.questionTeacher questionTeacher
+            where testStudent.id = :testId
+            order by questionStudent.id
+            """)
+    List<CheckQuestionTeacherResponse> findByIdCheckQuestionTeacher(@Param(value = "testId") Long testId);
+
+    @Query("""
+            select
+            new com.example.gradeassure.dto.response.CheckOptionResponse(
+             optionTeacher.id,
+             optionTeacher.option,
+             optionTeacher.letter,
+             optionTeacher.correct,
+             coalesce(case when optionTeacher.letter = optionStudent.letter then true else false end ,false )
+            )
+            from QuestionStudent questionStudent
+            left join questionStudent.questionTeacher questionTeacher
+            left join questionTeacher.optionsTeachers optionTeacher
+            left join questionStudent.optionsStudent optionStudent
+            where questionStudent.id = :questionId
+            order by optionTeacher.id
+            """)
+    List<CheckOptionResponse> findByIdCheckOption(@Param(value = "questionId") Long questionId);
+
+    @Query("select video.video from Video video where video.answerVideo.id = :questionId")
+    String video(@Param(value = "questionId") Long questionId);
+
+    @Query("select audio.audio from Audio audio where audio.answerAudio.id = :questionId")
+    String audio(@Param(value = "questionId") Long questionId);
 }
+
+//@Query("""
+//            select
+//            new com.example.gradeassure.dto.response.CheckTestStudentResponse(
+//            testStudent.id,
+//            (select
+//            new com.example.gradeassure.dto.response.CheckQuestionTeacherResponse(
+//             questionTeacher.id,
+//             questionTeacher.question,
+//
+//             coalesce(
+//              (select
+//              new com.example.gradeassure.dto.response.CheckOptionResponse(
+//               optionTeacher.id,
+//               optionTeacher.option,
+//               optionTeacher.letter,
+//               optionTeacher.correct
+//              )
+//              from questionTeacher.optionsTeachers optionTeacher
+//              join questionStudent.optionsStudent optionStudent
+//              where questionTeacher.id = questionStudent.questionTeacher.id
+//              and questionTeacher.answerFormat = 'OPTION'
+//             ),
+//             null
+//             ),
+//
+//             coalesce(
+//              (select video from questionStudent.video.video video
+//              where questionTeacher.id = questionStudent.questionTeacher.id
+//              and questionTeacher.answerFormat = 'VIDEO'
+//              ),
+//             null
+//             ),
+//
+//             coalesce(
+//              (select audio from questionStudent.audio.audio audio
+//              where questionTeacher.id = questionStudent.questionTeacher.id
+//              and questionTeacher.answerFormat = 'AUDIO'
+//              ),
+//             null
+//             )
+//
+//             )
+//             from testTeacher.questionTeachers questionTeacher
+//             join testStudent.questionStudents questionStudent
+//             )
+//
+//            )
+//            from TestTeacher testTeacher
+//            join testTeacher.testStudents testStudent
+//            where testStudent.id = :testId
+//            """)
+//    CheckTestStudentResponse findByIdCheckTestStudent(@Param(value = "testId") Long testId);
+
+
+//@Query("""
+//            select
+//            new com.example.gradeassure.dto.response.CheckTestStudentResponse(
+//            testStudent.id,
+//             (select
+//             new com.example.gradeassure.dto.response.CheckQuestionTeacherResponse(
+//             questionTeacher.id,
+//             questionTeacher.question,
+//             coalesce(
+//              case when questionTeacher.id = questionStudent.questionTeacher.id
+//              and questionTeacher.answerFormat = 'OPTION' then
+//               (select
+//               new com.example.gradeassure.dto.response.CheckOptionResponse(
+//               optionTeacher.id,
+//               optionTeacher.option,
+//               optionTeacher.letter,
+//               optionTeacher.correct,
+//               coalesce(case when optionStudent.letter = optionTeacher.letter then true else false end,false )
+//               )
+//               from questionTeacher.optionsTeachers optionTeacher
+//               join questionStudent.optionsStudent optionStudent
+//               ) end, null
+//              ),
+//              coalesce(
+//               case when questionStudent.id = questionStudent.questionTeacher.id
+//               and questionTeacher.answerFormat = 'VIDEO' then
+//               (select video from questionStudent.video.video video)
+//               end ,null
+//              ),
+//              coalesce(
+//               case when questionStudent.id = questionStudent.questionTeacher.id
+//               and questionTeacher.answerFormat = 'AUDIO' then
+//               (select audio from questionStudent.audio.audio audio)
+//               end, null
+//              )
+//             )
+//             from testTeacher.questionTeachers questionTeacher
+//             join testStudent.questionStudents questionStudent
+//             )
+//            )
+//            from TestTeacher testTeacher
+//            join testTeacher.testStudents testStudent
+//            where testStudent.id = :testId
+//            """)

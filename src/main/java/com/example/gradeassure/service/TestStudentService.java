@@ -132,4 +132,23 @@ public class TestStudentService {
             throw new RuntimeException("You do not have access to this test");
         return testStudentRepository.findAllResultTest(testName);
     }
+
+    public CheckTestStudentResponse findByIdTestStudentCheck(Long testId) {
+        CheckTestStudentResponse testStudentResponse = testTeacherRepository.findByIdCheckTestStudent(testId);
+        System.out.println(testStudentResponse);
+        List<CheckQuestionTeacherResponse> list = testTeacherRepository.findByIdCheckQuestionTeacher(testId);
+        System.out.println(list);
+        list.forEach(
+                a -> {
+                    if (a.getAnswerFormat() == AnswerFormat.OPTION)
+                        a.setOptions(testTeacherRepository.findByIdCheckOption(a.getId()));
+                    if (a.getAnswerFormat() == AnswerFormat.AUDIO)
+                        a.setAudio(testTeacherRepository.audio(a.getId()));
+                    if (a.getAnswerFormat() == AnswerFormat.VIDEO)
+                        a.setVideo(testTeacherRepository.video(a.getId()));
+                }
+        );
+        testStudentResponse.setQuestions(list);
+        return testStudentResponse;
+    }
 }

@@ -2,10 +2,7 @@ package com.example.gradeassure.api;
 
 import com.example.gradeassure.dto.request.OptionsTeacherRequest;
 import com.example.gradeassure.dto.request.QuestionTeacherRequest;
-import com.example.gradeassure.dto.response.QuestionTeacherResponse;
-import com.example.gradeassure.dto.response.ResultResponse;
-import com.example.gradeassure.dto.response.TestForStudentResponse;
-import com.example.gradeassure.dto.response.TestTeacherResponse;
+import com.example.gradeassure.dto.response.*;
 import com.example.gradeassure.service.TestStudentService;
 import com.example.gradeassure.service.TestTeacherService;
 import lombok.RequiredArgsConstructor;
@@ -73,5 +70,10 @@ public class TestTeacherApi {
             @RequestParam String email
     ) {
         return testStudentService.findAllResultTest(testName, email);
+    }
+
+    @GetMapping("find/by/id/student/test/check")
+    public CheckTestStudentResponse check(@RequestParam Long testId) {
+        return testStudentService.findByIdTestStudentCheck(testId);
     }
 }

@@ -23,6 +23,7 @@ public interface QuestionStudentRepository extends JpaRepository<QuestionStudent
             from TestStudent test
             join test.questionStudents question
             where test.id = :testId
+            order by test.id
             """)
     List<QuestionStudentResponse> findByAllQuestionResponse(@Param("testId") Long testId);
 }
