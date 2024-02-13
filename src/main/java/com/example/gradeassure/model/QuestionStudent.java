@@ -28,4 +28,8 @@ public class QuestionStudent {
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private OptionsStudent optionsStudent;
+
+    @ManyToOne
+    @JoinColumn(name = "question_teacher_id")
+    private QuestionTeacher questionTeacher;
 }

@@ -3,6 +3,7 @@ package com.example.gradeassure.service;
 import com.example.gradeassure.dto.request.OptionsTeacherRequest;
 import com.example.gradeassure.dto.request.QuestionTeacherRequest;
 import com.example.gradeassure.dto.response.QuestionTeacherResponse;
+import com.example.gradeassure.dto.response.TestForStudentResponse;
 import com.example.gradeassure.dto.response.TestTeacherResponse;
 import com.example.gradeassure.model.*;
 import com.example.gradeassure.repository.*;
@@ -116,5 +117,10 @@ public class TestTeacherService {
                     return questionTeacherResponse;
                 }
         ).toList();
+    }
+
+    //    TODO: check test
+    public List<TestForStudentResponse> findAllTestForTeacher(String email) {
+        return testTeacherRepository.findAllTestResponseForTeacher(email);
     }
 }

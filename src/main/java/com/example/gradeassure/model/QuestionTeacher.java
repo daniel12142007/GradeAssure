@@ -31,4 +31,6 @@ public class QuestionTeacher {
 
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OptionsTeacher> optionsTeachers;
+    @OneToMany(mappedBy = "questionTeacher")
+    private List<QuestionStudent> questionStudents;
 }

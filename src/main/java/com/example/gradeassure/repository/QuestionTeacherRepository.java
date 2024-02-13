@@ -1,6 +1,7 @@
 package com.example.gradeassure.repository;
 
 import com.example.gradeassure.dto.response.QuestionTeacherResponse;
+import com.example.gradeassure.model.OptionsTeacher;
 import com.example.gradeassure.model.QuestionTeacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,4 +37,15 @@ public interface QuestionTeacherRepository extends JpaRepository<QuestionTeacher
             where q.testTeacher.id = :testId
             """)
     int findCountQuestionByIdTest(@Param("testId") Long testId);
+
+    @Query("""
+            select question
+            from QuestionTeacher question
+            where question.testTeacher.id = :id
+            order by question.id
+            """)
+    List<QuestionTeacher> findAllQuestionTeacher(@Param(value = "id") Long id);
+
+    @Query("select question.points from QuestionStudent quesitonStudent join quesitonStudent.questionTeacher question where quesitonStudent.id = :id")
+    int findByIdQuestionTeacher(@Param(value = "id") Long id);
 }

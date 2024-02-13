@@ -199,16 +199,13 @@ public class RequestSchoolAdminService {
                     return response;
                 })
                 .collect(Collectors.toList());
-
         return blockedAdminResponses;
     }
 
     public List<SchoolAdminResponse> getAllBlockedSchoolAdmins() {
         List<SchoolAdmin> blockedSchoolAdmins = schoolAdminRepository.findAllBlockedSchoolAdmins();
-
         return blockedSchoolAdmins.stream()
                 .map(schoolAdmin -> new SchoolAdminResponse(schoolAdmin.getId(), schoolAdmin.getFullName(), schoolAdmin.getEmail()))
                 .collect(Collectors.toList());
     }
-
 }

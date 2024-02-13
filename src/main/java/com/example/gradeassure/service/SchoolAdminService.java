@@ -2,15 +2,15 @@ package com.example.gradeassure.service;
 
 import com.example.gradeassure.dto.response.*;
 import com.example.gradeassure.model.*;
+import com.example.gradeassure.model.enums.AnswerFormat;
 import com.example.gradeassure.model.enums.Role;
-import com.example.gradeassure.repository.RequestStudentRepository;
-import com.example.gradeassure.repository.StudentRepository;
-import com.example.gradeassure.repository.UserRepository;
+import com.example.gradeassure.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,11 +18,16 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class SchoolAdminService {
     private final UserRepository userRepository;
     private final StudentRepository studentRepository;
     private final RequestStudentRepository requestStudentRepository;
     private final RequestStudentService requestStudentService;
+    private final TestTeacherRepository testTeacherRepository;
+    private final TestStudentRepository testStudentRepository;
+    private final QuestionTeacherRepository questionTeacherRepository;
+    private final QuestionStudentRepository questionStudentRepository;
 
     public List<RequestStudentFindAllResponse> refuseByIdAll(List<Long> studentId) {
         List<RequestStudent> list = requestStudentRepository.findAllStudentsRequestById(studentId).stream().map(
@@ -43,6 +48,26 @@ public class SchoolAdminService {
         requestStudent.setDateDeadline(LocalDateTime.now().plusDays(requestStudent.getDays()));
         requestStudent.setAnswered(true);
         Student student = requestStudent.getStudent();
+
+        TestTeacher testTeacher = testTeacherRepository.findByName(requestStudent.getTestName());
+
+        TestStudent testStudent = new TestStudent();
+        testStudent.setName(requestStudent.getTestName());
+        testStudent.setStudent(student);
+        testStudent.setChecked(false);
+        testStudent.setDateCreated(LocalDateTime.now());
+        testStudent.setTestTeacher(testTeacher);
+        testStudentRepository.save(testStudent);
+
+        questionTeacherRepository.findAllQuestionTeacher(testTeacher.getId()).forEach(a -> {
+            QuestionStudent questionStudent = new QuestionStudent();
+            questionStudent.setQuestion(a.getQuestion());
+            questionStudent.setTestStudent(testStudent);
+            questionStudent.setQuestionTeacher(a);
+            questionStudent.setAnswerFormat(a.getAnswerFormat());
+            questionStudentRepository.save(questionStudent);
+        });
+
         if (requestStudentRepository.allowStudent(student.getEmail())) {
             User user = student.getUser();
             user.setRole(Role.STUDENT);
