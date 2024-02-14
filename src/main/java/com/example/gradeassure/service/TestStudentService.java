@@ -242,4 +242,8 @@ public class TestStudentService {
             return ResponseEntity.status(500).build();
         }
     }
+
+    public List<TestStudentResponse> findAllTestStudent(String email) {
+        return testStudentRepository.findAllTestStudentForStudent(email);
+    }
 }
