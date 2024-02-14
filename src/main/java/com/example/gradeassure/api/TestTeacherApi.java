@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/test/teacher")
-//@PreAuthorize("hasAnyAuthority('TEACHER')")
+@PreAuthorize("hasAnyAuthority('TEACHER')")
 public class TestTeacherApi {
     private final TestTeacherService teacherService;
     private final TestStudentService testStudentService;

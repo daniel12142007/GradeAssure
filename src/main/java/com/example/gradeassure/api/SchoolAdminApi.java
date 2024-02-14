@@ -39,4 +39,28 @@ public class SchoolAdminApi {
     public List<ResultResponse> findAllStudents(@RequestParam String testName) {
         return testStudentService.findAllResultTestSchoolAdmin(testName);
     }
+
+    @GetMapping("find/all/students/users")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
+    public List<UsersResponse> findAllStudents() {
+        return schoolAdminService.findAllStudents();
+    }
+
+    @GetMapping("find/all/teachers/users")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
+    public List<UsersResponse> findAllTeachers() {
+        return schoolAdminService.findAllTeachers();
+    }
+
+    @GetMapping("find/by/teacher")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
+    public TeacherOneResponse findByTeachers(@RequestParam Long teacherID) {
+        return schoolAdminService.findByIdTeacher(teacherID);
+    }
+
+    @GetMapping("find/by/student")
+    @PreAuthorize("hasAnyAuthority('ADMINSCHOOL')")
+    public StudentOneResponse findByStudents(@RequestParam Long studentID) {
+        return schoolAdminService.findByIdStudent(studentID);
+    }
 }

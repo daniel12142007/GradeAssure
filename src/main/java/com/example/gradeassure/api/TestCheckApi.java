@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/test/check")
 @RequiredArgsConstructor
-//@PreAuthorize("hasAnyAuthority('TEACHER')")
+@PreAuthorize("hasAnyAuthority('TEACHER')")
 public class TestCheckApi {
     private final TestStudentService testStudentService;
     private final TestTeacherService testTeacherService;
@@ -52,10 +52,3 @@ public class TestCheckApi {
         return testTeacherService.finishCheck(testId,email);
     }
 }
-//@GetMapping("find/result")
-//    public List<ResultResponse> findResult(
-//            @RequestParam String testName,
-//            @RequestParam String email
-//    ) {
-//        return testStudentService.findAllResultTest(testName, email);
-//    }

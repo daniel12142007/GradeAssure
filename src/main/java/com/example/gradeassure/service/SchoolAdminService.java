@@ -28,6 +28,7 @@ public class SchoolAdminService {
     private final TestStudentRepository testStudentRepository;
     private final QuestionTeacherRepository questionTeacherRepository;
     private final QuestionStudentRepository questionStudentRepository;
+    private final TeacherRepository teacherRepository;
 
     public List<RequestStudentFindAllResponse> refuseByIdAll(List<Long> studentId) {
         List<RequestStudent> list = requestStudentRepository.findAllStudentsRequestById(studentId).stream().map(
@@ -97,5 +98,21 @@ public class SchoolAdminService {
                 }
         ).toList());
         return requestStudentService.findAllRequestStudent();
+    }
+
+    public List<UsersResponse> findAllStudents() {
+        return studentRepository.findAllStudents();
+    }
+
+    public List<UsersResponse> findAllTeachers() {
+        return teacherRepository.findAllTeacher();
+    }
+
+    public TeacherOneResponse findByIdTeacher(Long id) {
+        return teacherRepository.findByIdTeacherOne(id);
+    }
+
+    public StudentOneResponse findByIdStudent(Long id) {
+        return studentRepository.findByIdStudent(id);
     }
 }
