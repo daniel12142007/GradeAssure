@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/test/teacher")
-//@PreAuthorize("hasAnyAuthority('TEACHER')")
+@PreAuthorize("hasAnyAuthority('TEACHER')")
 public class TestTeacherApi {
     private final TestTeacherService teacherService;
     private final TestStudentService testStudentService;
@@ -70,10 +70,5 @@ public class TestTeacherApi {
             @RequestParam String email
     ) {
         return testStudentService.findAllResultTest(testName, email);
-    }
-
-    @GetMapping("find/by/id/student/test/check")
-    public CheckTestStudentResponse check(@RequestParam Long testId) {
-        return testStudentService.findByIdTestStudentCheck(testId);
     }
 }
