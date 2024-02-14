@@ -36,11 +36,9 @@ public interface TestStudentRepository extends JpaRepository<TestStudent, Long> 
                     test.student.fullName,
                     test.dateCreated,
                     (select sum(quest.points)
-                     from TestTeacher testTeacher
-                     join testTeacher.questionTeachers quest
-                     where testTeacher.id = test.id),
-                     coalesce(case when test.status = 'UNDEFINED' then false else true end,true)
-                     ,
+                    from test.testTeacher testTeacher
+                    join testTeacher.questionTeachers quest),
+                     coalesce(case when test.status = 'UNDEFINED' then false else true end,true),
                     test.status,
                     (select
                      sum(question.points)
@@ -56,8 +54,40 @@ public interface TestStudentRepository extends JpaRepository<TestStudent, Long> 
                     or questsion.video is not null
                     or questsion.optionsStudent is not null
                     group by test.id, test.student.fullName, test.dateCreated, test.status
+                    ORDER BY test.id
                     """)
     List<ResultResponse> findAllResultTest(@Param("testName") String testName);
+
+    @Query("""
+            select
+            new com.example.gradeassure.dto.response.ResultResponse(
+                    test.id,
+                    test.student.fullName,
+                    test.dateCreated,
+                    (select sum(quest.points)
+                    from test.testTeacher testTeacher
+                    join testTeacher.questionTeachers quest),
+                    true,
+                    test.status,
+                    (select
+                     sum(question.points)
+                     from TestStudent testStudent
+                     join testStudent.questionStudents question
+                     where testStudent.id = test.id)
+                    )
+                    from TestStudent test
+                    join test.questionStudents questsion
+                    where
+                    test.name = :testName
+                    and not test.status = 'UNDEFINED'
+                    and questsion.audio is not null
+                    or questsion.video is not null
+                    or questsion.optionsStudent is not null
+                    group by test.id, test.student.fullName, test.dateCreated, test.status
+                    ORDER BY test.id
+                    """)
+    List<ResultResponse> findAllResultTestForSchoolAdmin(@Param("testName") String testName);
+
 
     @Query("""
             select
@@ -78,3 +108,31 @@ public interface TestStudentRepository extends JpaRepository<TestStudent, Long> 
             """)
     long checkQuestion(@RequestParam(value = "testId") Long testId);
 }
+//@Query("""
+//            select
+//            new com.example.gradeassure.dto.response.ResultResponse(
+//                    test.id,
+//                    test.student.fullName,
+//                    test.dateCreated,
+//                    (select sum(quest.points)
+//                     from TestTeacher testTeacher
+//                     join testTeacher.questionTeachers quest
+//                     where testTeacher.id = test.id),
+//                     coalesce(case when test.status = 'UNDEFINED' then false else true end,true),
+//                    test.status,
+//                    (select
+//                     sum(question.points)
+//                     from TestStudent testStudent
+//                     join testStudent.questionStudents question
+//                     where testStudent.id = test.id)
+//                    )
+//                    from TestStudent test
+//                    join test.questionStudents questsion
+//                    where
+//                    test.name = :testName
+//                    and questsion.audio is not null
+//                    or questsion.video is not null
+//                    or questsion.optionsStudent is not null
+//                    """)
+////                    group by test.id, test.student.fullName, test.dateCreated, test.status
+//    List<ResultResponse> findAllResultTest(@Param("testName") String testName);

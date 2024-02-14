@@ -8,13 +8,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class TestForStudentResponse {
+@NoArgsConstructor
+@Builder
+public class TestStudentResponse {
     private Long id;
-    private boolean access;
     private String testName;
-    private LocalDateTime dateCreated;
+    private LocalDateTime datePassing;
     private long passed;
 }

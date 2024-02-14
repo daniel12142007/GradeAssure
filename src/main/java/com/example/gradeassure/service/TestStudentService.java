@@ -4,16 +4,28 @@ import com.example.gradeassure.dto.response.*;
 import com.example.gradeassure.model.*;
 import com.example.gradeassure.model.enums.AnswerFormat;
 import com.example.gradeassure.repository.*;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -134,6 +146,10 @@ public class TestStudentService {
         return testStudentRepository.findAllResultTest(testName);
     }
 
+    public List<ResultResponse> findAllResultTestSchoolAdmin(String testName) {
+        return testStudentRepository.findAllResultTestForSchoolAdmin(testName);
+    }
+
     public CheckTestStudentResponse findByIdTestStudentCheck(Long testId, String email) {
         if (!testTeacherRepository.checkTeacher(email))
             throw new RuntimeException("You do not have access to this test");
@@ -151,5 +167,79 @@ public class TestStudentService {
         );
         testStudentResponse.setQuestions(list);
         return testStudentResponse;
+    }
+
+    public ResponseEntity<byte[]> lookPdf(String testName, String email) {
+        if (!testTeacherRepository.checkTeacher(email))
+            throw new RuntimeException("You do not have access to this test");
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            Document document = new Document(PageSize.A4.rotate());
+            PdfWriter.getInstance(document, byteArrayOutputStream);
+            document.open();
+
+            PdfPTable table = new PdfPTable(5);
+            addTableHeader(table);
+            addRows(table, testName);
+
+            document.add(table);
+            document.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(byteArrayOutputStream.toByteArray());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    private void addTableHeader(PdfPTable table) {
+        Stream.of("ID", "Full Name", "Data", "Results", "Passed")
+                .forEach(columnTitle -> {
+                    PdfPCell header = new PdfPCell();
+                    header.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                    header.setBorderWidth(1);
+                    header.setPhrase(new Phrase(columnTitle));
+                    table.addCell(header);
+                });
+    }
+
+    private void addRows(PdfPTable table, String testName) {
+        testStudentRepository.findAllResultTest(testName).forEach(
+                a -> {
+                    table.addCell(String.valueOf(a.getId()));
+                    table.addCell(String.valueOf(a.getFullName()));
+                    table.addCell(String.valueOf(a.getDatePassing()));
+                    table.addCell(String.valueOf(a.getMaxPoint() + "/" + a.getPoint()));
+                    table.addCell(String.valueOf(a.getStatus()));
+                }
+        );
+    }
+
+    public ResponseEntity<byte[]> downloadPdf(String testName, String email) {
+        if (!testTeacherRepository.checkTeacher(email))
+            throw new RuntimeException("You do not have access to this test");
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            Document document = new Document(PageSize.A4.rotate());
+            PdfWriter.getInstance(document, byteArrayOutputStream);
+            document.open();
+
+            PdfPTable table = new PdfPTable(5);
+            addTableHeader(table);
+            addRows(table, testName);
+
+            document.add(table);
+            document.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("inline", testName + ".pdf");
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(byteArrayOutputStream.toByteArray());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
     }
 }
